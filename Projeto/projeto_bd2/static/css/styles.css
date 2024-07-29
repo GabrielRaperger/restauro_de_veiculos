@@ -1,0 +1,196 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  background: #333;
+  color: #fff;
+  padding: 15px;
+  height: 100vh;
+}
+
+.sidebar h2 {
+  color: #fff;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style-type: none;
+}
+
+.sidebar ul li {
+  margin: 15px 0;
+}
+
+.sidebar ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px;
+  display: block;
+  transition: background 0.3s;
+}
+
+.sidebar ul li a:hover {
+  background: #575757;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  background: #fff;
+  min-height: 100vh;
+}
+/* Custom styles for this template */
+#wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+#sidebar-wrapper {
+  min-height: 100vh;
+  margin-left: -250px;
+  transition: margin 0.25s ease-out;
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 250px;
+}
+
+#page-content-wrapper {
+  width: 100%;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+                                                            /*CLIENTES */
+
+/* Container da tabela de clientes */
+.clientes-table-container {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para a barra de pesquisa */
+#searchInput {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ced4da;
+}
+
+/* Estilo para ícones de ordenação */
+.fa-sort {
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.fa-sort:hover {
+  color: #007bff;
+}
+
+/* Estilo para a tabela */
+.clientes-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Cabeçalhos da tabela */
+.clientes-table thead th {
+  background-color: #343a40;
+  color: #ffffff;
+  text-align: left;
+  padding: 1rem;
+  position: relative;
+}
+
+/* Linhas da tabela */
+.clientes-table tbody tr {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.clientes-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Células da tabela */
+.clientes-table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+/* Estilo para a tabela com borda */
+.clientes-table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.clientes-table-bordered td, .clientes-table-bordered th {
+  border: 1px solid #dee2e6;
+}
+
+/* Estilo para botões com ícones */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estilo para botão de ação do carro */
+.btn-car {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-car:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+}
+
+/* Estilo para botão de visualizar dados do cliente */
+.btn-view {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-view:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+/* Estilo para ícones nos botões */
+.btn-icon i {
+  margin-right: 0.5rem; /* Espaço entre ícone e texto */
+}

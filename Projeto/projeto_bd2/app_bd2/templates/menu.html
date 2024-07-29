@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>{% block title %}Minha Aplicação{% endblock %}</title>
+    <style>
+        .navbar-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px; /* Ajuste a altura conforme necessário */
+        }
+        .navbar-brand {
+            flex: 1;
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .user-info {
+            bottom: 0;
+            right: 0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            border-top: 1px solid #e9ecef;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Torna a imagem redonda */
+            margin-right: 10px;
+            object-fit: cover; /* Garante que a imagem preencha o espaço sem distorção */
+        }
+        .user-info span {
+            color: white;
+            font-size: 16px; /* Tamanho da fonte do nome do usuário */
+        }
+        /* Certifica-se de que o menu dropdown abre à direita */
+.dropdown-menu {
+    left: 0; /* Ajusta a posição horizontal do menu dropdown */
+    right: auto; /* Garante que o menu não se sobreponha ao botão */
+}
+
+    </style>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading text-white">Menu</div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-home"></i> Início</a>
+                <div class="dropdown">
+                    <a href="#" class="list-group-item list-group-item-action bg-dark text-white dropdown-toggle" id="dropdownVeiculos" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-tags"></i> Veículos
+                    </a>
+                    <div class="dropdown-menu bg-dark" aria-labelledby="dropdownVeiculos">
+                        <a href="{% url 'categoria3' %}" class="dropdown-item bg-dark text-white">
+                            <i class="fas fa-list"></i> Veículos
+                        </a>
+                        <a href="{% url 'categoria3' %}" class="dropdown-item bg-dark text-white">
+                            <i class="fas fa-car-side"></i> Entrada de Veículos
+                        </a>
+                        <a href="{% url 'categoria3' %}" class="dropdown-item bg-dark text-white">
+                            <i class="fas fa-car-crash"></i> Saída de Veículos
+                        </a>
+                    </div>
+                </div>
+                
+                <a href="{% url 'categoria3' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-box"></i> Reparações</a>
+                <a href="{% url 'clientes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-list"></i> Clientes</a>
+                <a href="{% url 'sobre' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-info-circle"></i> Faturas</a>
+                <a href="{% url 'sobre' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-info-circle"></i> Mão de Obra</a>
+                <a href="{% url 'sobre' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-info-circle"></i> Tipo de Serviços</a>
+                
+                <div class="user-info">
+                    <img src="{% static 'img/avatar.jpg' %}" alt="Avatar"> <!-- Imagem padrão -->
+                    <span>{{ user.username }} ADMINISTRADOR</span>
+                </div>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <button class="btn btn-dark" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                <div class="navbar-brand">
+                    <h3 class="m-0">{{ page_title }}</h3>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Bootstrap core JavaScript -->
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+
+
+<!-- Bootstrap -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+</body>
+</html>
