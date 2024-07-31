@@ -7,11 +7,11 @@ def home(request):
 def clientes(request):
     return render(request,'admin/clientes.html', {'page_title': 'Home'})
 
-def categoria2(request):
-    return render(request, 'categoria2.html')
+def faturas(request):
+    return render(request, 'admin/faturas.html')
 
-def categoria3(request):
-    return render(request, 'categoria3.html')
+def reparacoes(request):
+    return render(request, 'admin/reparacoes.html')
 
-def sobre(request):
-    return render(request, 'sobre.html')
+def veiculos(request):
+    return render(request, 'admin/veiculos.html')
