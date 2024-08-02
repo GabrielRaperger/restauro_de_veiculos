@@ -1,0 +1,20 @@
+# Ambiente virtual
+env/
+venv/
+
+# Arquivo de configuração local
+*.env
+settings_local.py
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Cache e arquivos temporários
+*.pyc
+__pycache__/
+*.log
+
+# Django
+media/
+staticfiles/

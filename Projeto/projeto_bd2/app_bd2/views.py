@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import models
 
 # Create your views here.
 def home(request):
@@ -11,7 +12,7 @@ def lista_faturas(request):
     return render(request, 'faturas/lista_faturas.html')
 
 def ver_faturas(request):
-    return render(request, 'faturas/ver_faturas.html', {'fatura': fatura})
+    return render(request, 'faturas/ver_faturas.html', {'fatura':  models.Faturas})
 
 def reparacoes(request):
     return render(request, 'reparacoes/lista_reparacoes.html')

@@ -76,11 +76,14 @@ WSGI_APPLICATION = 'projeto_bd2.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'BD2',
+        'USER': 'postgres',
+        'PASSWORD': 'estgv',
+        'HOST': 'localhost',  # Ou o endereço IP do servidor PostgreSQL se estiver remoto
+        'PORT': '5432',       # Porta padrão do PostgreSQL
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
