@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.db import models
+from django.shortcuts import render, get_object_or_404
+from .models import Faturas
 
 # Create your views here.
 def home(request):
@@ -11,8 +12,9 @@ def clientes(request):
 def lista_faturas(request):
     return render(request, 'faturas/lista_faturas.html')
 
-def ver_faturas(request):
-    return render(request, 'faturas/ver_faturas.html', {'fatura':  models.Faturas})
+def ver_faturas(request, id_faturas):
+    fatura = get_object_or_404(Faturas, id_faturas=id_faturas)
+    return render(request, 'faturas/ver_faturas.html', {'fatura':  fatura})
 
 def reparacoes(request):
     return render(request, 'reparacoes/lista_reparacoes.html')
