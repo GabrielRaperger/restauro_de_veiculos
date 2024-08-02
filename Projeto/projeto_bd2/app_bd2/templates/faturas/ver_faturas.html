@@ -7,22 +7,28 @@
     <h2>Detalhes da Fatura</h2>
     <table class="table table-bordered">
         <tr>
-            <th>Número da Fatura:</th>
-            <td>aa</td>
+            <th>ID da Fatura:</th>
+            <td>{{ fatura.id_faturas }}</td>
         </tr>
         <tr>
             <th>Data de Emissão:</th>
-            <td></td>
+            <td>{{ fatura.data_emissao|date:"d \d\e F \d\e Y, H:i" }}</td>
         </tr>
         <tr>
             <th>Valor Total:</th>
-            <td></td>
+            <td>{{ fatura.valor_total }}</td>
         </tr>
         <tr>
-            <th>Status de Pagamento:</th>
-            <td></td>
+            <th>ID da Saída:</th>
+            <td>{{ fatura.id_saida.id_saida }}</td>
+        </tr>
+        <tr>
+            <th>ID do Usuário:</th>
+            <td>{{ fatura.id_usuarios.nome }}</td>
         </tr>
     </table>
-    <a href="{% url 'lista_faturas' %}" class="btn btn-secondary">Voltar à Lista</a>
+    <div class="text-center mt-4">
+        <a href="{% url 'lista_faturas' %}" class="btn btn-primary">Voltar à Lista</a>
+    </div>
 </div>
 {% endblock %}
