@@ -1,112 +1,70 @@
 {% extends "menu.html" %}
 
-{% block title %}Clientes - Minha Aplicação{% endblock %}
+{% block title %}Faturas - Minha Aplicação{% endblock %}
 
 {% block content %}
 <div class="clientes-table-container">
     <h2 class="mb-4">Lista de Faturas</h2>
 
-    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por nome">
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por número da fatura">
 
-    <table class="table clientes-table clientes-table-bordered mt-3" id="clientesTable">
+    <table class="table faturas-table faturas-table-bordered mt-3" id="faturasTable">
         <thead>
             <tr>
-                <th onclick="sortTable(0)">Nome <i class="fas fa-sort" id="sortIcon0"></i></th>
-                <th onclick="sortTable(1)">NIF <i class="fas fa-sort" id="sortIcon1"></i></th>
-                <th onclick="sortTable(2)">Email <i class="fas fa-sort" id="sortIcon2"></i></th>
-                <th>Telemovel</th>
+                <th onclick="sortTable(0)">Número da Fatura <i class="fas fa-sort" id="sortIcon0"></i></th>
+                <th onclick="sortTable(1)">Data de Emissão <i class="fas fa-sort" id="sortIcon1"></i></th>
+                <th onclick="sortTable(2)">Valor Total <i class="fas fa-sort" id="sortIcon2"></i></th>
+                <th>Status de Pagamento</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>João Silva</td>
-                <td>987654321</td>
-                <td>joao.silva@example.com</td>
-                <td>(11) 98765-4321</td>
+                <td>2023/001</td>
+                <td>01/01/2023</td>
+                <td>€100.00</td>
+                <td>Pago</td>
                 <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'faturas' %}" class="btn btn-warning btn-icon">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
+                    <a href="{% url 'ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
                         <i class="fas fa-eye"></i> Ver Dados
+                    </a>
+                    <a href="{% url 'ver_faturas' 1 %}" class="btn btn-success btn-icon btn-pay">
+                        <i class="fas fa-credit-card"></i> Pagar
                     </a>
                 </td>
             </tr>
             <tr>
-                <td>Maria Oliveira</td>
-                <td>123456789</td>
-                <td>maria.oliveira@example.com</td>
-                <td>(21) 97654-3210</td>
+                <td>2023/002</td>
+                <td>15/01/2023</td>
+                <td>€200.00</td>
+                <td>Pendente</td>
                 <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'faturas' %}" class="btn btn-warning btn-icon">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
+                    <a href="{% url 'ver_faturas' 2 %}" class="btn btn-primary btn-icon btn-view">
                         <i class="fas fa-eye"></i> Ver Dados
+                    </a>
+                    <a href="{% url 'ver_faturas' 2 %}" class="btn btn-success btn-icon btn-pay">
+                        <i class="fas fa-credit-card"></i> Pagar
                     </a>
                 </td>
             </tr>
+            {% for fatura in faturas %}
             <tr>
-                <td>Pedro Santos</td>
-                <td>112233445</td>
-                <td>pedro.santos@example.com</td>
-                <td>(31) 96543-2109</td>
+                <td>{{ fatura.numero }}</td>
+                <td>{{ fatura.data_emissao }}</td>
+                <td>{{ fatura.valor_total }}</td>
+                <td>{{ fatura.status_pagamento }}</td>
                 <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'faturas' %}" class="btn btn-warning btn-icon">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
+                    <a href="{% url 'ver_faturas' fatura.id %}" class="btn btn-primary btn-icon btn-view">
                         <i class="fas fa-eye"></i> Ver Dados
                     </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Ana Costa</td>
-                <td>556677889</td>
-                <td>ana.costa@example.com</td>
-                <td>(41) 95321-6789</td>
-                <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'faturas' %}" class="btn btn-warning btn-icon">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-eye"></i> Ver Dados
-                    </a>
-                </td>
-            </tr>
-            {% for cliente in clientes %}
-            <tr>
-                <td>{{ cliente.nome }}</td>
-                <td>{{ cliente.email }}</td>
-                <td>{{ cliente.telefone }}</td>
-                <td>
-                    <a href="{% url 'faturas' cliente.id %}" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'faturas' %}" class="btn btn-warning btn-icon">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="{% url 'faturas' cliente.id %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-eye"></i> Ver Dados
+                    <a href="{% url 'ver_faturas' fatura.id %}" class="btn btn-success btn-icon btn-pay">
+                        <i class="fas fa-credit-card"></i> Pagar
                     </a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center">Nenhum cliente encontrado.</td>
+                <td colspan="5" class="text-center">Nenhuma fatura encontrada.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -116,7 +74,7 @@
 <script>
     // Função para ordenar a tabela
     function sortTable(n) {
-        var table = document.getElementById("clientesTable");
+        var table = document.getElementById("faturasTable");
         var rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
         var switchIcon = document.getElementById(`sortIcon${n}`);
         var dir = switchIcon.getAttribute("data-dir") === "asc" ? "desc" : "asc";
@@ -164,7 +122,7 @@
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("searchInput");
         filter = input.value.toLowerCase();
-        table = document.getElementById("clientesTable");
+        table = document.getElementById("faturasTable");
         tr = table.getElementsByTagName("tr");
         
         for (i = 1; i < tr.length; i++) {
@@ -184,6 +142,5 @@
     });
 </script>
 {% endblock %}
-
 
 {% endblock %}
