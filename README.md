@@ -1,27 +1,21 @@
 # Configuração do projeto
 
-
-
 ## Versões
 
 - Django 5.0.6
 - PostgreSQL 8.7
 - MongoDB 1.43.4
 
-
-
 ## PostgreSQL
 
 Criar uma base de dados com os seguintes dados:
 
-* NAME: bd2_projeto
+* NAME: BD2
 
 Criar um utilizador com os seguintes dados:
 
-* USER: admin
-* PASSWORD: admin
-
-
+* USER: postgres
+* PASSWORD: estgv
 
 ## Django
 
@@ -31,16 +25,14 @@ Criar um utilizador com os seguintes dados:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bd2_projeto',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost', 
-        'PORT': '5432',       
+        'NAME': 'BD2',
+        'USER': 'postgres',
+        'PASSWORD': 'estgv',
+        'HOST': 'localhost',
+        'PORT': '5432', 
     }
 }
 ```
-
-
 
 ## Executar script
 
@@ -57,15 +49,11 @@ Este comando irá:
 - Criar os grupos "admin", "cliente", e "trabalhador" se ainda não existirem.
 - Criar os utilizadores  "cliente", e "trabalhador" e associá-los aos respectivos grupos.
 
-
-
 ## Correr servidor
 
 ```shell
 python manage.py runserver
 ```
-
-
 
 ## Informação dos Utilizadores
 
