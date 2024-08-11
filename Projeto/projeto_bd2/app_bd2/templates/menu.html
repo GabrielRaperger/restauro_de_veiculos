@@ -81,7 +81,7 @@
                 
                 <div class="user-info d-flex align-items-center">
                     <img src="{% static 'img/avatar.jpg' %}" alt="Avatar">
-                    <span class="ml-2">{{ user.username }} Nome</span>
+                    <span class="ml-2">{{ request.user.username }}</span>
 
                     <a href="{% url 'login_bd2:logout' %}" class="btn btn-danger ml-auto">
                         <i class="fas fa-sign-out-alt"></i>
