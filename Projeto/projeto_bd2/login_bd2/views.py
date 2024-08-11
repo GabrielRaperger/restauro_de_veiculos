@@ -11,7 +11,7 @@ class LoginView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            return redirect('app_bd2:dashboard')
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
@@ -23,7 +23,7 @@ class LoginView(View):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
+                return redirect('app_bd2:dashboard')
         return render(request, self.template_name, {'form': form})
 
 def logout_view(request):

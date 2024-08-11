@@ -1,13 +1,11 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
+
 from .models import Faturas, MaoDeObra
 
 # Create your views here.
-def home(request):
-    return render(request, 'admin/home.html', {'page_title': 'Home'})
-
-def login(request):
-    return render(request, 'login/login.html', {'page_title': 'Login'})
+def dashboard(request):
+    return render(request, 'dashboard.html', {'page_title': 'Dashboard'})
 
 def clientes(request):
     return render(request,'clientes/lista_clientes.html', {'page_title': 'Home'})
