@@ -36,6 +36,11 @@ DATABASES = {
 
 ## Executar script
 
+Executar os scripts de criação e inserção da pasta Modelos
+
+- Script_Criar_Tabelas.sql
+- Script_Inserir_Tabelas.sql
+
 Na raíz do projeto onde se situa o "manage.py" correr o seguinte comando:
 
 ```shell
