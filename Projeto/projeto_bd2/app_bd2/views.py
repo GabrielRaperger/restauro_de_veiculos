@@ -4,6 +4,7 @@ from django.db import connection
 from .forms.cliente import ClienteForm
 from .models import Faturas, MaoDeObra
 from datetime import datetime
+import json
 
 def dashboard(request):
     return render(request, 'dashboard.html', {'page_title': 'Dashboard'})
@@ -33,7 +34,7 @@ def adicionar_cliente(request):
 
 def lista_faturas(request):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM ListarFaturas()")
+        cursor.execute("SELECT * FROM listar_faturas()")
         resultados = cursor.fetchall()
     
     faturas = []
@@ -57,8 +58,31 @@ def lista_faturas(request):
     return render(request, 'faturas/lista_faturas.html', {'faturas': faturas})
 
 def ver_faturas(request, id_faturas):
-    fatura = get_object_or_404(Faturas, id_faturas=id_faturas)
-    return render(request, 'faturas/ver_faturas.html',{'fatura': fatura})
+    context = {}
+    
+    with connection.cursor() as cursor:
+        # Executa a função PostgreSQL
+        cursor.callproc('buscar_dados_fatura', [id_faturas])
+        result = cursor.fetchall()
+        
+        # Recupera os nomes das colunas
+        columns = [desc[0] for desc in cursor.description]
+        
+        # Converte os resultados em uma lista de dicionários
+        result_dict = [dict(zip(columns, row)) for row in result]
+        
+        # A função retorna uma única linha, então pegamos o primeiro item da lista
+        if result_dict:
+            fatura = result_dict[0]
+            # Se a mão de obra estiver em formato JSON, converte de volta para dicionário
+            if fatura.get('mao_de_obra'):
+                fatura['mao_de_obra'] = json.loads(fatura['mao_de_obra'])
+            context['fatura'] = fatura
+        else:
+            context['error'] = 'Fatura não encontrada.'
+
+
+    return render(request, 'faturas/ver_faturas.html',context)
 
 def lista_MaoDeObra(request):
     return render(request, 'MaoDeObra/lista_MaoDeObra.html')

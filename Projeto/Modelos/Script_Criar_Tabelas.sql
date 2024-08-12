@@ -1,4 +1,3 @@
-
 -- Criação das tabelas
 CREATE TABLE modelo (
     id_modelo SERIAL PRIMARY KEY,
@@ -36,11 +35,12 @@ CREATE TABLE restauro (
     id_restauro SERIAL PRIMARY KEY,
     id_entrada INTEGER REFERENCES entrada(id_entrada),
     valor_restauro NUMERIC
+    -- Não há referência para a tabela saida
 );
 
 CREATE TABLE saida (
     id_saida SERIAL PRIMARY KEY,
-    id_restauro INTEGER REFERENCES restauro(id_restauro),
+    id_restauro INTEGER REFERENCES restauro(id_restauro),  -- Adicionada referência à tabela restauro
     data TIMESTAMP
 );
 

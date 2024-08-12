@@ -3,32 +3,59 @@
 {% block title %}Detalhes da Fatura{% endblock %}
 
 {% block content %}
+
 <div class="clientes-detalhes-container">
     <h2>Detalhes da Fatura</h2>
     <table class="table table-bordered">
         <tr>
             <th>ID da Fatura:</th>
-            <td>{{ fatura.id_faturas }}</td>
+            <td>{{ fatura.id_fatura }}</td>
         </tr>
         <tr>
             <th>Data de Emissão:</th>
             <td>{{ fatura.data_emissao|date:"d \d\e F \d\e Y, H:i" }}</td>
         </tr>
         <tr>
+            <th>Nome do Cliente:</th>
+            <td>{{ fatura.nome_cliente }}</td>
+        </tr>
+        <tr>
+            <th>NIF do Cliente:</th>
+            <td>{{ fatura.nif_cliente }}</td>
+        </tr>
+        <tr>
+            <th>Email do Cliente:</th>
+            <td>{{ fatura.email_cliente }}</td>
+        </tr>
+        <tr>
+            <th>Mão de Obra:</th>
+            <td>
+                <ul class="indent-list">
+                    {% for mao in fatura.mao_de_obra %}
+                    <li> <b>Tarefa:</b> {{ mao.nome }}, <b>Valor:</b> {{ mao.valor }}</li>
+                    {% empty %}
+                    <li>Não há mão de obra associada.</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <th>Valor Total:</th>
             <td>{{ fatura.valor_total }}</td>
-        </tr>
-        <tr>
-            <th>ID da Saída:</th>
-            <td>{{ fatura.id_saida.id_saida }}</td>
-        </tr>
-        <tr>
-            <th>ID do Usuário:</th>
-            <td>{{ fatura.id_usuarios.nome }}</td>
         </tr>
     </table>
     <div class="text-center mt-4">
         <a href="{% url 'app_bd2:lista_faturas' %}" class="btn btn-primary">Voltar à Lista</a>
     </div>
 </div>
+<style>
+    .indent-list {
+        margin-left: 10px; /* Adiciona a margem à esquerda */
+        list-style-type: none; /* Remove os marcadores da lista, se necessário */
+        padding-left: 0; /* Remove o padding padrão da lista */
+    }
+    .indent-list li {
+        padding-left: 0; /* Remove o padding dos itens da lista, se necessário */
+    }
+</style>
 {% endblock %}
