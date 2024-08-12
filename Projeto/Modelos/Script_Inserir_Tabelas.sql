@@ -1,97 +1,83 @@
--- Inserção de dados na tabela MODELO
-INSERT INTO MODELO (NOME) VALUES ('Modelo A');
-INSERT INTO MODELO (NOME) VALUES ('Modelo B');
-INSERT INTO MODELO (NOME) VALUES ('Modelo C');
-INSERT INTO MODELO (NOME) VALUES ('Modelo D');
-INSERT INTO MODELO (NOME) VALUES ('Modelo E');
+-- Inserir dados nas tabelas MODELO e MARCA
+INSERT INTO MODELO (NOME) VALUES
+    ('Modelo A'), ('Modelo B'), ('Modelo C'),
+    ('Modelo D'), ('Modelo E'), ('Modelo F'),
+    ('Modelo G'), ('Modelo H'), ('Modelo I'),
+    ('Modelo J');
 
--- Inserção de dados na tabela MARCA (após MODELO)
-INSERT INTO MARCA (ID_MODELO, NOME) VALUES (1, 'Marca X');
-INSERT INTO MARCA (ID_MODELO, NOME) VALUES (2, 'Marca Y');
-INSERT INTO MARCA (ID_MODELO, NOME) VALUES (3, 'Marca Z');
-INSERT INTO MARCA (ID_MODELO, NOME) VALUES (4, 'Marca W');
-INSERT INTO MARCA (ID_MODELO, NOME) VALUES (5, 'Marca V');
+INSERT INTO MARCA (ID_MODELO, NOME) VALUES
+    (1, 'Marca X'), (1, 'Marca Y'), (2, 'Marca Z'),
+    (2, 'Marca W'), (3, 'Marca V'), (3, 'Marca U'),
+    (4, 'Marca T'), (4, 'Marca S'), (5, 'Marca R'),
+    (5, 'Marca Q');
 
--- Inserção de dados na tabela USUARIOS
-INSERT INTO USUARIOS (NOME, NIF, TELEMOVEL, ENDERECO, EMAIL) VALUES ('Usuario 1', '123456789', '912345678', 'Endereco 1', 'usuario1@example.com');
-INSERT INTO USUARIOS (NOME, NIF, TELEMOVEL, ENDERECO, EMAIL) VALUES ('Usuario 2', '234567890', '923456789', 'Endereco 2', 'usuario2@example.com');
-INSERT INTO USUARIOS (NOME, NIF, TELEMOVEL, ENDERECO, EMAIL) VALUES ('Usuario 3', '345678901', '934567890', 'Endereco 3', 'usuario3@example.com');
-INSERT INTO USUARIOS (NOME, NIF, TELEMOVEL, ENDERECO, EMAIL) VALUES ('Usuario 4', '456789012', '945678901', 'Endereco 4', 'usuario4@example.com');
-INSERT INTO USUARIOS (NOME, NIF, TELEMOVEL, ENDERECO, EMAIL) VALUES ('Usuario 5', '567890123', '956789012', 'Endereco 5', 'usuario5@example.com');
+-- Inserir dados nas tabelas USUARIOS e VEICULO
+INSERT INTO USUARIOS (NOME, NIF, TELEMOVEL, ENDERECO, EMAIL) VALUES
+    ('João Silva', '123456789', '912345678', 'Rua A, 1', 'joao.silva@example.com'),
+    ('Maria Pereira', '234567890', '923456789', 'Rua B, 2', 'maria.pereira@example.com'),
+    ('Carlos Santos', '345678901', '934567890', 'Rua C, 3', 'carlos.santos@example.com'),
+    ('Ana Costa', '456789012', '945678901', 'Rua D, 4', 'ana.costa@example.com'),
+    ('Pedro Oliveira', '567890123', '956789012', 'Rua E, 5', 'pedro.oliveira@example.com'),
+    ('Luís Ferreira', '678901234', '967890123', 'Rua F, 6', 'luis.ferreira@example.com'),
+    ('Beatriz Martins', '789012345', '978901234', 'Rua G, 7', 'beatriz.martins@example.com'),
+    ('Miguel Almeida', '890123456', '989012345', 'Rua H, 8', 'miguel.almeida@example.com'),
+    ('Sofia Rocha', '901234567', '990123456', 'Rua I, 9', 'sofia.rocha@example.com'),
+    ('Ricardo Sousa', '012345678', '991234567', 'Rua J, 10', 'ricardo.sousa@example.com');
 
--- Inserção de dados na tabela VEICULO
-INSERT INTO VEICULO (ID_MARCA, ID_USUARIOS) VALUES (1, 1);
-INSERT INTO VEICULO (ID_MARCA, ID_USUARIOS) VALUES (2, 2);
-INSERT INTO VEICULO (ID_MARCA, ID_USUARIOS) VALUES (3, 3);
-INSERT INTO VEICULO (ID_MARCA, ID_USUARIOS) VALUES (4, 4);
-INSERT INTO VEICULO (ID_MARCA, ID_USUARIOS) VALUES (5, 5);
+INSERT INTO VEICULO (ID_MARCA, ID_USUARIOS) VALUES
+    (1, 1), (2, 1), (3, 2), (4, 2),
+    (5, 3), (6, 3), (7, 4), (8, 4),
+    (9, 5), (10, 5), (1, 6), (2, 6),
+    (3, 7), (4, 7), (5, 8), (6, 8),
+    (7, 9), (8, 9), (9, 10), (10, 10);
 
--- Inserção de dados na tabela ENTRADA
-INSERT INTO ENTRADA (ID_VEICULO, DATA) VALUES (1, '2024-08-01 10:00:00');
-INSERT INTO ENTRADA (ID_VEICULO, DATA) VALUES (2, '2024-08-02 11:00:00');
-INSERT INTO ENTRADA (ID_VEICULO, DATA) VALUES (3, '2024-08-03 12:00:00');
-INSERT INTO ENTRADA (ID_VEICULO, DATA) VALUES (4, '2024-08-04 13:00:00');
-INSERT INTO ENTRADA (ID_VEICULO, DATA) VALUES (5, '2024-08-05 14:00:00');
+-- Inserir dados na tabela ENTRADA
+INSERT INTO ENTRADA (ID_VEICULO, DATA) VALUES
+    (1, '2024-08-01 10:00:00'), (2, '2024-08-02 11:00:00'),
+    (3, '2024-08-03 12:00:00'), (4, '2024-08-04 13:00:00'),
+    (5, '2024-08-05 14:00:00'), (6, '2024-08-06 15:00:00'),
+    (7, '2024-08-07 16:00:00'), (8, '2024-08-08 17:00:00'),
+    (9, '2024-08-09 18:00:00'), (10, '2024-08-10 19:00:00');
 
--- Inserção de dados na tabela SAIDA
-INSERT INTO SAIDA (DATA) VALUES ('2024-08-01 15:00:00');
-INSERT INTO SAIDA (DATA) VALUES ('2024-08-02 16:00:00');
-INSERT INTO SAIDA (DATA) VALUES ('2024-08-03 17:00:00');
-INSERT INTO SAIDA (DATA) VALUES ('2024-08-04 18:00:00');
-INSERT INTO SAIDA (DATA) VALUES ('2024-08-05 19:00:00');
+-- Inserir dados na tabela RESTAURO
+INSERT INTO RESTAURO (ID_ENTRADA, VALOR_RESTAURO) VALUES
+    (1, 150.00), (2, 200.00), (3, 250.00),
+    (4, 300.00), (5, 350.00), (6, 400.00),
+    (7, 450.00), (8, 500.00), (9, 550.00),
+    (10, 600.00);
 
--- Inserção de dados na tabela FATURAS
-INSERT INTO FATURAS (ID_SAIDA, ID_USUARIOS, DATA_EMISSAO, VALOR_TOTAL) VALUES (1, 1, '2024-08-01 10:00:00', 100.00);
-INSERT INTO FATURAS (ID_SAIDA, ID_USUARIOS, DATA_EMISSAO, VALOR_TOTAL) VALUES (2, 2, '2024-08-02 11:00:00', 200.00);
-INSERT INTO FATURAS (ID_SAIDA, ID_USUARIOS, DATA_EMISSAO, VALOR_TOTAL) VALUES (3, 3, '2024-08-03 12:00:00', 300.00);
-INSERT INTO FATURAS (ID_SAIDA, ID_USUARIOS, DATA_EMISSAO, VALOR_TOTAL) VALUES (4, 4, '2024-08-04 13:00:00', 400.00);
-INSERT INTO FATURAS (ID_SAIDA, ID_USUARIOS, DATA_EMISSAO, VALOR_TOTAL) VALUES (5, 5, '2024-08-05 14:00:00', 500.00);
+-- Inserir dados na tabela SAIDA
+INSERT INTO SAIDA (DATA) VALUES
+    ('2024-08-11 20:00:00'), ('2024-08-12 21:00:00'),
+    ('2024-08-13 22:00:00'), ('2024-08-14 23:00:00'),
+    ('2024-08-15 10:00:00'), ('2024-08-16 11:00:00'),
+    ('2024-08-17 12:00:00'), ('2024-08-18 13:00:00'),
+    ('2024-08-19 14:00:00'), ('2024-08-20 15:00:00');
 
--- Inserção de dados na tabela ESPECIALIDADE_MAO
-INSERT INTO ESPECIALIDADE_MAO (NOME) VALUES ('Especialidade 1');
-INSERT INTO ESPECIALIDADE_MAO (NOME) VALUES ('Especialidade 2');
-INSERT INTO ESPECIALIDADE_MAO (NOME) VALUES ('Especialidade 3');
-INSERT INTO ESPECIALIDADE_MAO (NOME) VALUES ('Especialidade 4');
-INSERT INTO ESPECIALIDADE_MAO (NOME) VALUES ('Especialidade 5');
+-- Inserir dados na tabela FATURAS
+INSERT INTO FATURAS (ID_SAIDA, ID_USUARIOS, DATA_EMISSAO, VALOR_TOTAL) VALUES
+    (1, 1, '2024-08-11 20:00:00', 150.00), (2, 2, '2024-08-12 21:00:00', 200.00),
+    (3, 3, '2024-08-13 22:00:00', 250.00), (4, 4, '2024-08-14 23:00:00', 300.00),
+    (5, 5, '2024-08-15 10:00:00', 350.00), (6, 6, '2024-08-16 11:00:00', 400.00),
+    (7, 7, '2024-08-17 12:00:00', 450.00), (8, 8, '2024-08-18 13:00:00', 500.00),
+    (9, 9, '2024-08-19 14:00:00', 550.00), (10, 10, '2024-08-20 15:00:00', 600.00);
 
--- Inserção de dados na tabela MAO_DE_OBRA
-INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES (1, 'Mão de Obra 1', 150.00);
-INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES (2, 'Mão de Obra 2', 250.00);
-INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES (3, 'Mão de Obra 3', 350.00);
-INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES (4, 'Mão de Obra 4', 450.00);
-INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES (5, 'Mão de Obra 5', 550.00);
+-- Inserir dados na tabela ESPECIALIDADE_MAO
+INSERT INTO ESPECIALIDADE_MAO (NOME) VALUES
+    ('Especialidade A'), ('Especialidade B'), ('Especialidade C'),
+    ('Especialidade D'), ('Especialidade E'), ('Especialidade F'),
+    ('Especialidade G'), ('Especialidade H'), ('Especialidade I'),
+    ('Especialidade J');
 
--- Inserção de dados na tabela RESTAURO
-INSERT INTO RESTAURO (ID_ENTRADA, ID_SAIDA, VALOR_RESTAURO) VALUES (1, 1, 10.00);
-INSERT INTO RESTAURO (ID_ENTRADA, ID_SAIDA, VALOR_RESTAURO) VALUES (2, 2, 20.00);
-INSERT INTO RESTAURO (ID_ENTRADA, ID_SAIDA, VALOR_RESTAURO) VALUES (3, 3, 30.00);
-INSERT INTO RESTAURO (ID_ENTRADA, ID_SAIDA, VALOR_RESTAURO) VALUES (4, 4, 40.00);
-INSERT INTO RESTAURO (ID_ENTRADA, ID_SAIDA, VALOR_RESTAURO) VALUES (5, 5, 50.00);
+-- Inserir dados na tabela MAO_DE_OBRA
+INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES
+    (1, 'Mão de Obra A', 100.00), (2, 'Mão de Obra B', 150.00),
+    (3, 'Mão de Obra C', 200.00), (4, 'Mão de Obra D', 250.00),
+    (5, 'Mão de Obra E', 300.00), (6, 'Mão de Obra F', 350.00),
+    (7, 'Mão de Obra G', 400.00), (8, 'Mão de Obra H', 450.00),
+    (9, 'Mão de Obra I', 500.00), (10, 'Mão de Obra J', 550.00);
 
--- Inserção de dados na tabela Modelo_Submodelo
-INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES (1);
-INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES (2);
-INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES (3);
-INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES (4);
-INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES (5);
-
--- Inserção de dados na tabela Mao_Restauro
-INSERT INTO Mao_Restauro (ID_MAO_DE_OBRA, ID_RESTAURO) VALUES (1, 1);
-INSERT INTO Mao_Restauro (ID_MAO_DE_OBRA, ID_RESTAURO) VALUES (2, 2);
-INSERT INTO Mao_Restauro (ID_MAO_DE_OBRA, ID_RESTAURO) VALUES (3, 3);
-INSERT INTO Mao_Restauro (ID_MAO_DE_OBRA, ID_RESTAURO) VALUES (4, 4);
-INSERT INTO Mao_Restauro (ID_MAO_DE_OBRA, ID_RESTAURO) VALUES (5, 5);
-
--- Inserção de dados na tabela Especialidade_Usuarios
-INSERT INTO Especialidade_Usuarios (ID_ESPECIALIDADE, ID_USUARIOS) VALUES (1, 1);
-INSERT INTO Especialidade_Usuarios (ID_ESPECIALIDADE, ID_USUARIOS) VALUES (2, 2);
-INSERT INTO Especialidade_Usuarios (ID_ESPECIALIDADE, ID_USUARIOS) VALUES (3, 3);
-INSERT INTO Especialidade_Usuarios (ID_ESPECIALIDADE, ID_USUARIOS) VALUES (4, 4);
-INSERT INTO Especialidade_Usuarios (ID_ESPECIALIDADE, ID_USUARIOS) VALUES (5, 5);
-
--- Inserção de dados na tabela SUB_MODELOS
-INSERT INTO SUB_MODELOS (NOME, POTENCIA, MOTORIZACAO, TRACAO) VALUES ('Submodelo 1', 100, 'Gasolina', 'Tração Dianteira');
-INSERT INTO SUB_MODELOS (NOME, POTENCIA, MOTORIZACAO, TRACAO) VALUES ('Submodelo 2', 150, 'Diesel', 'Tração Traseira');
-INSERT INTO SUB_MODELOS (NOME, POTENCIA, MOTORIZACAO, TRACAO) VALUES ('Submodelo 3', 200, 'Híbrido', 'Tração Integral');
-INSERT INTO SUB_MODELOS (NOME, POTENCIA, MOTORIZACAO, TRACAO) VALUES ('Submodelo 4', 250, 'Elétrico', 'Tração Dianteira');
-INSERT INTO SUB_MODELOS (NOME, POTENCIA, MOTORIZACAO, TRACAO) VALUES ('Submodelo 5', 300, 'Gasolina', 'Tração Traseira');
+-- Inserir dados na tabela Modelo_Submodelo
+INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES
+    (1), (1), (2), (2), (3),
+    (3), (4), (4), (5), (5);
