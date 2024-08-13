@@ -81,3 +81,9 @@ INSERT INTO MAO_DE_OBRA (ID_USUARIOS, NOME, VALOR) VALUES
 INSERT INTO Modelo_Submodelo (ID_MODELO) VALUES
     (1), (1), (2), (2), (3),
     (3), (4), (4), (5), (5);
+------------------------------------------------------------------------------------------
+-- Exemplo de editar dados de veiculo :queremos alterar o veículo com id_veiculo = 1 para a marca 4 e usuário 6
+UPDATE veiculo
+SET id_marca = 4, 
+    id_usuarios = 6
+WHERE id_veiculo = 1;
