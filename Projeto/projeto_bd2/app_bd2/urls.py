@@ -17,8 +17,5 @@ urlpatterns = [
     path('veiculos/', veiculos, name='veiculos'),
 
     #novo
-   path('veiculos/', views.lista_veiculos, name='lista_veiculos'),
-   path('veiculos/novo/', views.registar_veiculo, name='registar_veiculo'),
-   path('veiculos/<int:veiculo_id>/editar/', views.editar_veiculo, name='editar_veiculo'),
-   path('veiculos/ver/', views.ver_dados_veiculo, name='ver_dados_veiculo'),
+  
 ]

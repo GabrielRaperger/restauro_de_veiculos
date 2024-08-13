@@ -5,8 +5,7 @@ from .forms.cliente import ClienteForm
 from .models import Faturas, MaoDeObra
 from datetime import datetime
 import json
-from .forms import VeiculoForm
-from .models import Veiculo
+
 
 
 
@@ -102,41 +101,3 @@ def veiculos(request):
     return render(request, 'veiculos/lista_veiculos.html')
 
 ####################################################################novo
-def registar_veiculo(request):
-    if request.method == 'POST':
-        form = VeiculoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_veiculos')
-    else:
-        form = VeiculoForm()
-    return render(request, 'registar_veiculo.html', {'form': form})
-
-
-def editar_veiculo(request, veiculo_id):
-    veiculo = get_object_or_404(Veiculo, id=veiculo_id)
-
-    if request.method == 'POST':
-        form = VeiculoForm(request.POST, instance=veiculo)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_veiculos.html')  # Redireciona para a lista de veículos
-    else:
-        form = VeiculoForm(instance=veiculo)
-
-    return render(request, 'veiculos/editar_veiculo.html', {'form': form, 'veiculo': veiculo})
-
-
-def ver_dados_veiculo(request):
-    query = request.GET.get('q', '')
-    veiculos = Veiculo.objects.all()
-
-    if query:
-        veiculos = veiculos.filter(
-            marca__icontains=query) | veiculos.filter(
-            modelo__icontains=query) | veiculos.filter(
-            submodelo__icontains=query) | veiculos.filter(
-            matricula__icontains=query) | veiculos.filter(
-            cor__icontains=query)
-
-    return render(request, 'veiculos/ver_dados_veiculo.html', {'veiculos': veiculos, 'query': query})
