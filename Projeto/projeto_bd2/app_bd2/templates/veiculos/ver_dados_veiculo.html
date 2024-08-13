@@ -1,0 +1,54 @@
+{% extends "menu.html" %}
+
+{% block title %}Ver Dados do Veículo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Ver Dados do Veículo</h2>
+    
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por marca, modelo, matrícula, cor..." value="{{ query }}">
+
+    <table class="table table-bordered mt-3" id="veiculosTable">
+        <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Submodelo</th>
+                <th>Matrícula</th>
+                <th>Cor</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for veiculo in veiculos %}
+            <tr>
+                <td>{{ veiculo.marca }}</td>
+                <td>{{ veiculo.modelo }}</td>
+                <td>{{ veiculo.submodelo }}</td>
+                <td>{{ veiculo.matricula }}</td>
+                <td>{{ veiculo.cor }}</td>
+                <td>
+                    <a href="{% url 'editar_veiculo' veiculo.id %}" class="btn btn-primary btn-icon btn-edit">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Nenhum veículo encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% block extra_scripts %}
+<script>
+    document.getElementById("searchInput").addEventListener("input", function() {
+        var query = this.value;
+        window.location.href = "{% url 'ver_dados_veiculo' %}?q=" + encodeURIComponent(query);
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

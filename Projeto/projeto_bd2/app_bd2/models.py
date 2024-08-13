@@ -131,3 +131,15 @@ class SubModelos(models.Model):
 
     class Meta:
         db_table = 'sub_modelos'
+
+
+#novo
+class Veiculo(models.Model):
+    marca = models.CharField(max_length=100)
+    modelo = models.CharField(max_length=100)
+    submodelo = models.CharField(max_length=100)
+    matricula = models.CharField(max_length=20)
+    cor = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.marca} {self.modelo} ({self.matricula})"
