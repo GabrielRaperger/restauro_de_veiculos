@@ -136,3 +136,78 @@ BEGIN
         saida s ON s.id_saida = f.id_saida; -- Inclui a tabela 'saida' se você precisar do id_saida
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION listar_saidas_sem_fatura()
+RETURNS TABLE (
+    id_saida INTEGER,
+    data_saida TIMESTAMP,
+    nome_cliente VARCHAR(30),
+    nif_cliente VARCHAR(9),
+    mao_de_obra JSONB
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        s.id_saida,
+        s.data AS data_saida,
+        u.nome AS nome_cliente,
+        u.nif AS nif_cliente,
+        (
+            SELECT jsonb_agg(
+                jsonb_build_object(
+                    'id_mao_de_obra', mdo.id_mao_de_obra,
+                    'nome', mdo.nome,
+                    'valor', mdo.valor
+                )
+            )
+            FROM mao_de_obra mdo
+            JOIN mao_restauro mr ON mdo.id_mao_de_obra = mr.id_mao_de_obra
+            JOIN restauro r ON mr.id_restauro = r.id_restauro
+            WHERE r.id_entrada = e.id_entrada
+        ) AS mao_de_obra
+    FROM saida s
+    JOIN restauro r ON s.id_restauro = r.id_restauro
+    JOIN entrada e ON r.id_entrada = e.id_entrada
+    JOIN veiculo v ON e.id_veiculo = v.id_veiculo
+    JOIN usuarios u ON v.id_usuarios = u.id_usuarios
+    LEFT JOIN faturas f ON s.id_saida = f.id_saida
+    WHERE f.id_saida IS NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION criar_fatura(p_id_saida INTEGER)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id_usuario INTEGER;
+    v_valor_restauro NUMERIC;
+    v_id_faturas INTEGER;
+BEGIN
+    -- Obter o ID do usuário associado à saída
+    SELECT v.id_usuarios INTO v_id_usuario
+    FROM saida s
+    JOIN restauro r ON s.id_restauro = r.id_restauro
+    JOIN entrada e ON r.id_entrada = e.id_entrada
+    JOIN veiculo v ON e.id_veiculo = v.id_veiculo
+    WHERE s.id_saida = p_id_saida;
+    
+    -- Verificar se o ID do usuário foi encontrado
+    IF v_id_usuario IS NULL THEN
+        RAISE EXCEPTION 'Usuário não encontrado para a saída %', p_id_saida;
+    END IF;
+    
+    -- Obter o valor do restauro
+    SELECT r.valor_restauro INTO v_valor_restauro
+    FROM saida s
+    JOIN restauro r ON s.id_restauro = r.id_restauro
+    WHERE s.id_saida = p_id_saida;
+    
+    -- Inserir nova fatura
+    INSERT INTO faturas (id_saida, id_usuarios, data_emissao, valor_total)
+    VALUES (p_id_saida, v_id_usuario, CURRENT_TIMESTAMP, v_valor_restauro)
+    RETURNING id_faturas INTO v_id_faturas;
+
+    -- Retornar o ID da fatura criada
+    RETURN v_id_faturas;
+END;
+$$ LANGUAGE plpgsql;

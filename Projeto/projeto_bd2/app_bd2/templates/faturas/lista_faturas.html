@@ -6,26 +6,40 @@
 <div class="clientes-table-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Lista de Faturas</h2>
-        <a href="URL_GERAR_FATURA" class="btn btn-warning">
+        <a href="{% url 'app_bd2:lista_saida' %}" class="btn btn-warning">
             <i class="fas fa-file-invoice"></i> Gerar Fatura
         </a>
     </div>
 
-    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por número da fatura">
+    <form method="get" class="mb-3">
+        <input type="text" name="search" class="form-control" placeholder="Pesquisar..." value="{{ search_query }}">
+        <input type="hidden" name="sort_by" value="{{ sort_by }}">
+        <input type="hidden" name="sort_order" value="{{ sort_order }}">
+    </form>
 
     <table class="table faturas-table faturas-table-bordered mt-3" id="faturasTable">
         <thead>
             <tr>
-                <th onclick="sortTable(0)">Número da Fatura <i class="fas fa-sort" id="sortIcon0"></i></th>
-                <th onclick="sortTable(1)">Data de Emissão <i class="fas fa-sort" id="sortIcon1"></i></th>
-                <th onclick="sortTable(2)">Valor Total <i class="fas fa-sort" id="sortIcon2"></i></th>
-                <th onclick="sortTable(3)">Nome do Cliente <i class="fas fa-sort" id="sortIcon3"></th>
-                <th onclick="sortTable(4)">NIF do Cliente <i class="fas fa-sort" id="sortIcon4"></th>
+                <th>
+                    <a href="?sort_by=id_faturas&sort_order={% if sort_by == 'id_faturas' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Número da Fatura <i class="fas fa-sort {% if sort_by == 'id_faturas' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                </th>
+                <th>
+                    <a href="?sort_by=data_emissao&sort_order={% if sort_by == 'data_emissao' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Data de Emissão <i class="fas fa-sort {% if sort_by == 'data_emissao' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                </th>
+                <th>
+                    <a href="?sort_by=valor_total&sort_order={% if sort_by == 'valor_total' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Valor Total <i class="fas fa-sort {% if sort_by == 'valor_total' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                </th>
+                <th>
+                    <a href="?sort_by=nome_cliente&sort_order={% if sort_by == 'nome_cliente' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Nome do Cliente <i class="fas fa-sort {% if sort_by == 'nome_cliente' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                </th>
+                <th>
+                    <a href="?sort_by=nif_cliente&sort_order={% if sort_by == 'nif_cliente' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">NIF do Cliente <i class="fas fa-sort {% if sort_by == 'nif_cliente' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                </th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
-            {% for fatura in faturas %}
+            {% for fatura in page_obj %}
             <tr>
                 <td>{{ fatura.id_faturas }}</td>
                 <td>{{ fatura.data_emissao }}</td>
@@ -33,90 +47,50 @@
                 <td>{{ fatura.nome_cliente }}</td>
                 <td>{{ fatura.nif_cliente }}</td>
                 <td>
-                    <a href="{% url 'app_bd2:ver_faturas' fatura.id_faturas %}" class="btn btn-primary btn-icon btn-view">
+                    <a href="{% url 'app_bd2:ver_faturas' fatura.id_faturas %}" class="btn btn-info btn-icon">
                         <i class="fas fa-eye"></i> Ver Dados
                     </a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="text-center">Nenhuma fatura encontrada.</td>
+                <td colspan="6" class="text-center">Nenhuma fatura encontrada.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Paginação -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-end">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled"><span class="page-link">{{ page_obj.number }}</span></li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
-{% block extra_scripts %}
-<script>
-    // Função para ordenar a tabela
-    function sortTable(n) {
-        var table = document.getElementById("faturasTable");
-        var rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
-        var switchIcon = document.getElementById(`sortIcon${n}`);
-        var dir = switchIcon.getAttribute("data-dir") === "asc" ? "desc" : "asc";
-        var switching = true;
-        
-        // Remover a classe de direção anterior
-        document.querySelectorAll('th i').forEach(icon => icon.classList.remove('fa-sort-up', 'fa-sort-down'));
-
-        // Definir o ícone de ordenação atual
-        switchIcon.classList.add(dir === "asc" ? 'fa-sort-up' : 'fa-sort-down');
-        switchIcon.setAttribute("data-dir", dir);
-
-        while (switching) {
-            switching = false;
-            rows = table.rows;
-            
-            for (i = 1; i < (rows.length - 1); i++) {
-                shouldSwitch = false;
-                x = rows[i].getElementsByTagName("TD")[n];
-                y = rows[i + 1].getElementsByTagName("TD")[n];
-                
-                if (dir === "asc") {
-                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                } else {
-                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (shouldSwitch) {
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
-                switchCount++;
-            }
-        }
-    }
-
-    // Função para filtrar a tabela
-    document.getElementById("searchInput").addEventListener("input", function() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("searchInput");
-        filter = input.value.toLowerCase();
-        table = document.getElementById("faturasTable");
-        tr = table.getElementsByTagName("tr");
-        
-        for (i = 1; i < tr.length; i++) {
-            tr[i].style.display = "none";
-            td = tr[i].getElementsByTagName("td");
-            
-            for (var j = 0; j < td.length; j++) {
-                if (td[j]) {
-                    txtValue = td[j].textContent || td[j].innerText;
-                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                        break;
-                    }
-                }
-            }
-        }
-    });
-</script>
-{% endblock %}
-
 {% endblock %}
