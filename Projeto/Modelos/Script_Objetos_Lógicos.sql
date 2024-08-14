@@ -17,22 +17,26 @@ CREATE OR REPLACE PROCEDURE proc_inserir_cliente(
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    v_user_id INT;
+    v_user_id INTEGER;
+    v_group_id INTEGER;
 BEGIN
     INSERT INTO auth_user (username, first_name, last_name, email, password, is_active, is_staff, is_superuser, date_joined)
-    VALUES (p_username, p_first_name, p_last_name, p_email, crypt(p_password, gen_salt('bf')), true, false, false, CURRENT_TIMESTAMP)
+    VALUES (p_username, p_first_name, p_last_name, p_email, crypt(p_password, gen_salt('bf')), true, false, false, now())
     RETURNING id INTO v_user_id;
-    
+
+    SELECT id INTO v_group_id FROM auth_group WHERE name = p_group_name;
+
     INSERT INTO auth_user_groups (user_id, group_id)
-    SELECT u.id, g.id
-    FROM auth_user u, auth_group g
-    WHERE u.username = p_username AND g.name = p_group_name;
-    
-    INSERT INTO usuarios (id_usuarios, nome, nif, telemovel, endereco, email)
-    VALUES (v_user_id, p_first_name || ' ' || p_last_name, p_nif, p_telemovel, p_endereco, p_email);
+    VALUES (v_user_id, v_group_id);
+
+    INSERT INTO usuarios (nome, nif, telemovel, endereco, email, user_id)
+    VALUES (p_first_name || ' ' || p_last_name, p_nif, p_telemovel, p_endereco, p_email, v_user_id);
+
 END;
 $$;
 
+SELECT * FROM auth_user;
+SELECT * FROM usuarios;
 
 ---------------------------------- FATURAS -----------------------------------------
 

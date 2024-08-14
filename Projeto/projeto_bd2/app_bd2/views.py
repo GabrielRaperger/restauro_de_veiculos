@@ -2,11 +2,10 @@ from django.shortcuts import redirect, render
 from django.shortcuts import render, get_object_or_404
 from django.db import connection
 from .forms.cliente import ClienteForm
-from .models import Faturas, MaoDeObra
+from .models import MaoDeObra
 from datetime import datetime
+
 import json
-
-
 
 
 def dashboard(request):
@@ -25,15 +24,20 @@ def adicionar_cliente(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             group_name = 'Cliente' 
+            nif = form.cleaned_data.get('nif')
+            telemovel = form.cleaned_data.get('telemovel')
+            endereco = form.cleaned_data.get('endereco')
 
             with connection.cursor() as cursor:
-                cursor.execute("CALL proc_inserir_cliente(%s, %s, %s, %s, %s, %s);", 
-                               [username, first_name, last_name, email, password, group_name])
+                cursor.execute("CALL proc_inserir_cliente(%s, %s, %s, %s, %s, %s, %s, %s, %s);", 
+                               [username, first_name, last_name, email, password, group_name, nif, telemovel, endereco])
             
             return redirect('app_bd2:clientes')  
     else:
         form = ClienteForm()
+    
     return render(request, 'clientes/adicionar_cliente.html', {'form': form})
+
 
 def lista_faturas(request):
     with connection.cursor() as cursor:

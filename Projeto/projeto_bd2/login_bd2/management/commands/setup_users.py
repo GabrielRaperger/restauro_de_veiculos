@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User, Group
 from django.core.management import call_command
+from django.db import connection
 
 class Command(BaseCommand):
-    help = 'Aplicar migração, criar superuser, criar os restantes utilizadores e grupos'
+    help = 'Aplicar migração, criar superuser, criar os restantes utilizadores e grupos, e configurar chave estrangeira'
 
     def handle(self, *args, **options):
         # Aplicar migração
@@ -44,5 +45,21 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'Utilizador "{username}" criado e adicionado ao grupo "{group_name}"'))
             else:
                 self.stdout.write(self.style.WARNING(f'Utilizador "{username}" já existe'))
+
+        # Adicionar chave estrangeira entre auth_user e usuarios
+        self.stdout.write('A adicionar chave estrangeira entre auth_user e usuarios...')
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("""
+                    ALTER TABLE usuarios
+                    ADD COLUMN user_id INTEGER UNIQUE,
+                    ADD CONSTRAINT fk_user_id
+                    FOREIGN KEY (user_id)
+                    REFERENCES auth_user(id)
+                    ON DELETE CASCADE;
+                """)
+                self.stdout.write(self.style.SUCCESS('Chave estrangeira criada com sucesso'))
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'Erro ao criar chave estrangeira: {e}'))
 
         self.stdout.write(self.style.SUCCESS('Script executado com sucesso'))

@@ -23,18 +23,14 @@ class Marca(models.Model):
         return self.nome
 
 class Usuarios(models.Model):
-    id_usuarios = models.AutoField(primary_key=True)
-    nome = models.CharField(max_length=30)
-    nif = models.CharField(max_length=9, blank=True, null=True)
-    telemovel = models.CharField(max_length=12, blank=True, null=True)
-    endereco = models.CharField(max_length=50, blank=True, null=True)
-    email = models.EmailField(max_length=40, blank=True, null=True)
-
-    class Meta:
-        db_table = 'usuarios'
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='usuario')
+    nif = models.CharField(max_length=9, null=True, blank=True)
+    telemovel = models.CharField(max_length=12, null=True, blank=True)
+    endereco = models.CharField(max_length=50, null=True, blank=True)
+    email = models.CharField(max_length=40, unique=True)
 
     def __str__(self):
-        return self.nome
+        return self.user.username
 
 class Veiculo(models.Model):
     id_veiculo = models.AutoField(primary_key=True)
@@ -132,7 +128,3 @@ class SubModelos(models.Model):
 
     class Meta:
         db_table = 'sub_modelos'
-
-
-#novo
-
