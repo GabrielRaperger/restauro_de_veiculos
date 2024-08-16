@@ -81,28 +81,31 @@ def ver_cliente(request, id):
             'endereco': resultado[4],
         }
     else:
-        return redirect('listar_clientes')  
+        return redirect('app_bd2:clientes')  
 
     if request.method == 'POST':
         if 'update' in request.POST:
-            cursor.execute("""
-                UPDATE usuarios
-                SET nome = %s, nif = %s, email = %s, telemovel = %s, endereco = %s
-                WHERE id_usuarios = %s
-            """, [
-                request.POST['nome'],
-                request.POST['nif'],
-                request.POST['email'],
-                request.POST['telemovel'],
-                request.POST['endereco'],
-                id
-            ])
-            return redirect('listar_clientes')
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE usuarios
+                    SET nome = %s, nif = %s, email = %s, telemovel = %s, endereco = %s
+                    WHERE id_usuarios = %s
+                """, [
+                    request.POST['nome'],
+                    request.POST['nif'],
+                    request.POST['email'],
+                    request.POST['telemovel'],
+                    request.POST['endereco'],
+                    id
+                ])
+            return redirect('app_bd2:clientes')
         elif 'delete' in request.POST:
-            cursor.execute("DELETE FROM usuarios WHERE id_usuarios = %s", [id])
-            return redirect('listar_clientes')
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM usuarios WHERE id_usuarios = %s", [id])
+            return redirect('app_bd2:clientes')
 
     return render(request, 'clientes/ver_cliente.html', {'cliente': cliente, 'page_title': 'Ver Cliente'})
+
 
 
 # ------------------------ FATURAS -------------------------- #
