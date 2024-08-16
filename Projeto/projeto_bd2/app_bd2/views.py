@@ -15,11 +15,17 @@ def dashboard(request):
 
 def clientes(request):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT nome, nif, email, telemovel FROM usuarios")
+        cursor.execute("""
+            SELECT usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel
+                FROM usuarios 
+                    JOIN auth_user ON usuarios.user_id = auth_user.id 
+                    JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
+                    JOIN auth_group ON auth_user_groups.group_id = auth_group.id
+                WHERE auth_group.name = 'Cliente'
+        """)
         resultados = cursor.fetchall()
 
     clientes = []
-
     for row in resultados:
         clientes.append({
             'nome': row[0],
