@@ -16,7 +16,7 @@ def dashboard(request):
 def clientes(request):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel
+            SELECT usuarios.id_usuarios, usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel
                 FROM usuarios 
                     JOIN auth_user ON usuarios.user_id = auth_user.id 
                     JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
@@ -26,12 +26,14 @@ def clientes(request):
         resultados = cursor.fetchall()
 
     clientes = []
+
     for row in resultados:
         clientes.append({
-            'nome': row[0],
-            'nif': row[1],
-            'email': row[2],
-            'telemovel': row[3],
+            'id_usuarios': row[0],  
+            'nome': row[1],
+            'nif': row[2],
+            'email': row[3],
+            'telemovel': row[4],
         })
 
     return render(request, 'clientes/lista_clientes.html', {'clientes': clientes, 'page_title': 'Lista de Clientes'})
@@ -59,6 +61,49 @@ def adicionar_cliente(request):
         form = ClienteForm()
     
     return render(request, 'clientes/adicionar_cliente.html', {'form': form})
+
+def ver_cliente(request, id):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT u.nome, u.nif, u.email, u.telemovel, u.endereco
+            FROM usuarios u
+            WHERE u.id_usuarios = %s
+        """, [id])
+        resultado = cursor.fetchone()
+    
+    if resultado:
+        cliente = {
+            'id': id,
+            'nome': resultado[0],
+            'nif': resultado[1],
+            'email': resultado[2],
+            'telemovel': resultado[3],
+            'endereco': resultado[4],
+        }
+    else:
+        return redirect('listar_clientes')  
+
+    if request.method == 'POST':
+        if 'update' in request.POST:
+            cursor.execute("""
+                UPDATE usuarios
+                SET nome = %s, nif = %s, email = %s, telemovel = %s, endereco = %s
+                WHERE id_usuarios = %s
+            """, [
+                request.POST['nome'],
+                request.POST['nif'],
+                request.POST['email'],
+                request.POST['telemovel'],
+                request.POST['endereco'],
+                id
+            ])
+            return redirect('listar_clientes')
+        elif 'delete' in request.POST:
+            cursor.execute("DELETE FROM usuarios WHERE id_usuarios = %s", [id])
+            return redirect('listar_clientes')
+
+    return render(request, 'clientes/ver_cliente.html', {'cliente': cliente, 'page_title': 'Ver Cliente'})
+
 
 # ------------------------ FATURAS -------------------------- #
 
