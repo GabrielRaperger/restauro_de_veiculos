@@ -24,94 +24,27 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>João Silva</td>
-                <td>987654321</td>
-                <td>joao.silva@example.com</td>
-                <td>(11) 98765-4321</td>
-                <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-eye"></i> Ver Dados
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Maria Oliveira</td>
-                <td>123456789</td>
-                <td>maria.oliveira@example.com</td>
-                <td>(21) 97654-3210</td>
-                <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-eye"></i> Ver Dados
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Pedro Santos</td>
-                <td>112233445</td>
-                <td>pedro.santos@example.com</td>
-                <td>(31) 96543-2109</td>
-                <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="#" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-eye"></i> Ver Dados
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Ana Costa</td>
-                <td>556677889</td>
-                <td>ana.costa@example.com</td>
-                <td>(41) 95321-6789</td>
-                <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-file-invoice"></i> Faturas
-                    </a>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-eye"></i> Ver Dados
-                    </a>
-                </td>
-            </tr>
             {% for cliente in clientes %}
             <tr>
                 <td>{{ cliente.nome }}</td>
+                <td>{{ cliente.nif }}</td>
                 <td>{{ cliente.email }}</td>
-                <td>{{ cliente.telefone }}</td>
+                <td>{{ cliente.telemovel }}</td>
                 <td>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
+                    <a href="#" class="btn btn-info btn-icon btn-car">
                         <i class="fas fa-car"></i> Carro
                     </a>
                     <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
                         <i class="fas fa-file-invoice"></i> Faturas
                     </a>
-                    <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
+                    <a href="#" class="btn btn-primary btn-icon btn-view">
                         <i class="fas fa-eye"></i> Ver Dados
                     </a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center">Nenhum cliente encontrado.</td>
+                <td colspan="5" class="text-center">Nenhum cliente encontrado.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -189,6 +122,4 @@
     });
 </script>
 {% endblock %}
-
-
 {% endblock %}

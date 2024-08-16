@@ -14,7 +14,21 @@ def dashboard(request):
     return render(request, 'dashboard.html', {'page_title': 'Dashboard'})
 
 def clientes(request):
-    return render(request,'clientes/lista_clientes.html', {'page_title': 'Home'})
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT nome, nif, email, telemovel FROM usuarios")
+        resultados = cursor.fetchall()
+
+    clientes = []
+
+    for row in resultados:
+        clientes.append({
+            'nome': row[0],
+            'nif': row[1],
+            'email': row[2],
+            'telemovel': row[3],
+        })
+
+    return render(request, 'clientes/lista_clientes.html', {'clientes': clientes, 'page_title': 'Lista de Clientes'})
 
 def adicionar_cliente(request):
     if request.method == 'POST':
