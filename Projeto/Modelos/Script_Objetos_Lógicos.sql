@@ -211,3 +211,52 @@ BEGIN
     RETURN v_id_faturas;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-------------------------------- MAO DE OBRA ------------------------------------
+CREATE OR REPLACE FUNCTION listar_usuarios_com_especialidade()
+RETURNS TABLE (id_usuarios INT, nome TEXT, especialidade TEXT) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT u.id_usuarios, u.nome::TEXT, e.nome::TEXT
+    FROM usuarios u
+    JOIN especialidade_usuarios eu ON u.id_usuarios = eu.id_usuarios
+    JOIN especialidade_mao e ON eu.id_especialidade = e.id_especialidade;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION adicionar_mao_de_obra(
+    p_id_usuario INT,
+    p_nome TEXT,
+    p_valor DECIMAL
+)
+RETURNS VOID AS $$
+BEGIN
+    INSERT INTO mao_de_obra (id_usuarios, nome, valor)
+    VALUES (p_id_usuario, p_nome, p_valor);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION listar_mao_de_obra()
+RETURNS TABLE (
+    id_mao_de_obra INTEGER,
+    nome_mao_de_obra VARCHAR,
+    valor NUMERIC,
+    nome_usuario VARCHAR,
+    nif_usuario VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        mo.id_mao_de_obra,
+        mo.nome AS nome_mao_de_obra,
+        mo.valor,
+        u.nome AS nome_usuario,
+        u.nif AS nif_usuario
+    FROM
+        mao_de_obra mo
+    JOIN
+        usuarios u ON mo.id_usuarios = u.id_usuarios;
+END;
+$$ LANGUAGE plpgsql;

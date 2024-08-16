@@ -6,7 +6,7 @@ from .models import MaoDeObra
 from datetime import datetime
 import json
 from django.core.paginator import Paginator
-
+from django.contrib import messages
 import json
 
 
@@ -168,12 +168,96 @@ def lista_saida(request):
     return render(request, 'faturas/lista_saida.html', context)
 
 
+def adicionar_mao_de_obra(request):
+    if request.method == 'POST':
+        usuario_id = request.POST.get('usuario_id')
+        nome = request.POST.get('nome')
+        valor = request.POST.get('valor')
+        
+        if not usuario_id or not nome or not valor:
+            messages.error(request, "Todos os campos são obrigatórios.")
+            return redirect('mao_de_obra/adicionar_mao_obra.html')
+        
+        # Inserir a mão de obra usando a função SQL definida
+        try:
+            with connection.cursor() as cursor:
+                cursor.callproc('adicionar_mao_de_obra', [usuario_id, nome, valor])
+            messages.success(request, "Mão de obra adicionada com sucesso.")
+        except Exception as e:
+            messages.error(request, f"Erro ao adicionar mão de obra: {e}")
+        
+        return redirect('app_bd2:lista_MaoDeObra')
+    
+    # Obter os usuários com especialidades usando a função SQL definida
+    try:
+        with connection.cursor() as cursor:
+            cursor.callproc('listar_usuarios_com_especialidade')
+            usuarios = cursor.fetchall()
+        
+        # Convertemos o resultado para um formato de lista de dicionários para passar para o template
+        usuarios = [{'id_usuarios': row[0], 'nome': row[1], 'especialidade': row[2]} for row in usuarios]
+    except Exception as e:
+        usuarios = []
+        messages.error(request, f"Erro ao carregar usuários: {e}")
+    
+    context = {
+        'usuarios': usuarios
+    }
+    return render(request, 'mao_de_obra/adicionar_mao_obra.html', context)
+
 def lista_MaoDeObra(request):
-    return render(request, 'MaoDeObra/lista_MaoDeObra.html')
+    # Captura os parâmetros de ordenação e pesquisa
+    sort_by = request.GET.get('sort_by', 'nome_mao_de_obra')  # Padrão: nome_mao_de_obra
+    sort_order = request.GET.get('sort_order', 'asc')  # Padrão: asc
+    search_query = request.GET.get('search', '')
+
+    # Validação para evitar SQL Injection
+    valid_sort_columns = ['id_mao_de_obra', 'nome_mao_de_obra', 'valor', 'nome_usuario', 'nif_usuario']
+    if sort_by not in valid_sort_columns:
+        sort_by = 'nome_mao_de_obra'
+    if sort_order not in ['asc', 'desc']:
+        sort_order = 'asc'
+
+    # Monta a query SQL
+    sql_query = """
+        SELECT * FROM listar_mao_de_obra()
+    """
+    # Executa a query SQL
+    with connection.cursor() as cursor:
+        cursor.execute(sql_query)
+        resultados = cursor.fetchall()
+
+    # Filtrando resultados
+    mao_de_obra = []
+    for row in resultados:
+        if search_query.lower() in str(row).lower():
+            mao_de_obra.append({
+                'id_mao_de_obra': row[0],
+                'nome_mao_de_obra': row[1],
+                'valor': row[2],
+                'nome_usuario': row[3],
+                'nif_usuario': row[4],
+            })
+
+    # Ordenação dos resultados
+    mao_de_obra = sorted(mao_de_obra, key=lambda x: x.get(sort_by), reverse=(sort_order == 'desc'))
+
+    # Configuração da paginação
+    paginator = Paginator(mao_de_obra, 8)  # Exibe 8 registros por página
+    page_number = request.GET.get('page')  # Obtém o número da página da URL
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'mao_de_obra/lista_mao_de_obra.html', {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'sort_by': sort_by,
+        'sort_order': sort_order
+    })
 
 def ver_MaoDeObra(request, id_mao_de_obra):
     maoDeObra = get_object_or_404(MaoDeObra, id_mao_de_obra=id_mao_de_obra)
     return render(request, 'MaoDeObra/ver_MaoDeObra.html', {'maoDeObra':  maoDeObra})
+
 
 def reparacoes(request):
     return render(request, 'reparacoes/lista_reparacoes.html')

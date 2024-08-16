@@ -1,0 +1,48 @@
+{% extends "menu.html" %}
+
+{% block title %}Adicionar Mão de Obra - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="mao-obra-table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Adicionar Mão de Obra</h2>
+        <a href="{% url 'app_bd2:lista_MaoDeObra' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Preencha os detalhes abaixo
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'app_bd2:adicionar_mao_de_obra' %}">
+                {% csrf_token %}
+                <div class="form-group mt-3">
+                    <label for="nome">Nome da Mão de Obra</label>
+                    <input type="text" name="nome" id="nome" class="form-control" placeholder="Nome da mão de obra" required>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="valor">Valor</label>
+                    <input type="number" name="valor" id="valor" class="form-control" placeholder="Valor da mão de obra" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="usuario_id">Nome e Especialidade</label>
+                    <select name="usuario_id" id="usuario_id" class="form-control" required>
+                        {% if usuarios %}
+                            {% for usuario in usuarios %}
+                                <option value="{{ usuario.id_usuarios }}">
+                                    Nome: {{ usuario.nome }} - Especialidade: {{ usuario.especialidade }}
+                                </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="">Nenhum usuário com especialidade disponível</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mt-4">Adicionar Mão de Obra</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
