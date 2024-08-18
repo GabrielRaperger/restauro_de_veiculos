@@ -1,0 +1,46 @@
+{% extends "menu.html" %}
+
+{% block title %}Detalhes da Mão de Obra - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="clientes-table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Detalhes da Mão de Obra</h2>
+        <a href="{% url 'app_bd2:lista_MaoDeObra' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+
+    {% if mao_de_obra %}
+    <div class="card">
+        <div class="card-header">
+            Detalhes da Mão de Obra
+        </div>
+        <div class="card-body">
+            <p><strong>Nome da Mão de Obra:</strong> {{ mao_de_obra.nome }}</p>
+            <p><strong>Valor:</strong> {{ mao_de_obra.valor }}</p>
+            <p><strong>Nome do Usuário:</strong> {{ mao_de_obra.usuario_nome }}</p>
+            <p><strong>NIF do Usuário:</strong> {{ mao_de_obra.usuario_nif }}</p>
+            <p><strong>Especialidade do Usuário:</strong> {{ mao_de_obra.especialidade_nome }}</p>
+            
+            <!-- Botões de Editar e Deletar -->
+            <div class="mt-4">
+                <a href="{% url 'app_bd2:editar_mao_de_obra' id_mao_de_obra=mao_de_obra.id_mao_de_obra %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <form method="post" action="{% url 'app_bd2:deletar_mao_de_obra' id_mao_de_obra=mao_de_obra.id_mao_de_obra %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza de que deseja excluir esta mão de obra?');">
+                        <i class="fas fa-trash"></i> Deletar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Detalhes da mão de obra não encontrados.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

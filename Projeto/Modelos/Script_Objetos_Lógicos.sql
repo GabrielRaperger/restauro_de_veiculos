@@ -40,6 +40,31 @@ SELECT * FROM usuarios;
 
 ---------------------------------- FATURAS -----------------------------------------
 
+CREATE OR REPLACE FUNCTION calcular_valor_fatura() 
+RETURNS TRIGGER AS $$
+DECLARE
+    soma_valor NUMERIC;
+BEGIN
+
+    SELECT COALESCE(SUM(m.valor), 0) INTO soma_valor
+    FROM mao_de_obra m
+    JOIN mao_restauro mr ON m.id_mao_de_obra = mr.id_mao_de_obra
+    JOIN restauro r ON r.id_restauro = mr.id_restauro
+    JOIN saida s ON s.id_restauro = r.id_restauro
+    WHERE s.id_saida = NEW.id_saida;
+
+    NEW.valor_total = soma_valor;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER before_insert_faturas
+BEFORE INSERT ON faturas
+FOR EACH ROW
+EXECUTE FUNCTION calcular_valor_fatura();
+
 
 CREATE OR REPLACE FUNCTION buscar_dados_fatura(fatura_id INTEGER)
 RETURNS TABLE (
@@ -122,7 +147,7 @@ BEGIN
     RETURN QUERY
     SELECT
         f.id_faturas,
-        s.id_saida,         -- Assumindo que você também deseja incluir o id_saida
+        s.id_saida,         
         f.id_usuarios,
         u.nome AS nome_cliente,
         u.nif AS nif_cliente,
@@ -133,7 +158,7 @@ BEGIN
     JOIN
         usuarios u ON f.id_usuarios = u.id_usuarios
     LEFT JOIN
-        saida s ON s.id_saida = f.id_saida; -- Inclui a tabela 'saida' se você precisar do id_saida
+        saida s ON s.id_saida = f.id_saida; 
 END;
 $$ LANGUAGE plpgsql;
 
@@ -183,7 +208,7 @@ DECLARE
     v_valor_restauro NUMERIC;
     v_id_faturas INTEGER;
 BEGIN
-    -- Obter o ID do usuário associado à saída
+    
     SELECT v.id_usuarios INTO v_id_usuario
     FROM saida s
     JOIN restauro r ON s.id_restauro = r.id_restauro
@@ -191,23 +216,23 @@ BEGIN
     JOIN veiculo v ON e.id_veiculo = v.id_veiculo
     WHERE s.id_saida = p_id_saida;
     
-    -- Verificar se o ID do usuário foi encontrado
+    
     IF v_id_usuario IS NULL THEN
         RAISE EXCEPTION 'Usuário não encontrado para a saída %', p_id_saida;
     END IF;
     
-    -- Obter o valor do restauro
+    
     SELECT r.valor_restauro INTO v_valor_restauro
     FROM saida s
     JOIN restauro r ON s.id_restauro = r.id_restauro
     WHERE s.id_saida = p_id_saida;
     
-    -- Inserir nova fatura
+    
     INSERT INTO faturas (id_saida, id_usuarios, data_emissao, valor_total)
     VALUES (p_id_saida, v_id_usuario, CURRENT_TIMESTAMP, v_valor_restauro)
     RETURNING id_faturas INTO v_id_faturas;
 
-    -- Retornar o ID da fatura criada
+    
     RETURN v_id_faturas;
 END;
 $$ LANGUAGE plpgsql;
@@ -260,3 +285,48 @@ BEGIN
         usuarios u ON mo.id_usuarios = u.id_usuarios;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_mao_de_obra_details(p_id_mao_de_obra INTEGER)
+RETURNS TABLE (
+    mao_de_obra_nome VARCHAR(30),
+    mao_de_obra_valor NUMERIC,
+    usuario_nome VARCHAR(30),
+    usuario_nif VARCHAR(9),
+    especialidade_nome VARCHAR(30)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        m.nome AS mao_de_obra_nome,
+        m.valor AS mao_de_obra_valor,
+        u.nome AS usuario_nome,
+        u.nif AS usuario_nif,
+        e.nome AS especialidade_nome
+    FROM 
+        mao_de_obra m
+    JOIN 
+        usuarios u ON m.id_usuarios = u.id_usuarios
+    LEFT JOIN 
+        especialidade_usuarios eu ON u.id_usuarios = eu.id_usuarios
+    LEFT JOIN 
+        especialidade_mao e ON eu.id_especialidade = e.id_especialidade
+    WHERE 
+        m.id_mao_de_obra = p_id_mao_de_obra;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE atualizar_mao_de_obra(
+    p_id_mao_de_obra INTEGER,
+    p_nome VARCHAR(30),
+    p_valor NUMERIC,
+    p_usuario_id INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE mao_de_obra
+    SET nome = p_nome, valor = p_valor, id_usuarios = p_usuario_id
+    WHERE id_mao_de_obra = p_id_mao_de_obra;
+END;
+$$;
+

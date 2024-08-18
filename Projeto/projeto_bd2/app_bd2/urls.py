@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import adicionar_cliente, clientes, dashboard, lista_MaoDeObra, lista_faturas, reparacoes, veiculos, ver_MaoDeObra, ver_faturas, lista_saida, adicionar_mao_de_obra
+from .views import adicionar_cliente, clientes, dashboard, lista_MaoDeObra, lista_faturas, reparacoes, veiculos, ver_faturas, lista_saida, adicionar_mao_de_obra
 from . import views
 
 app_name = 'app_bd2'
@@ -16,10 +16,12 @@ urlpatterns = [
     path('faturas/saida', lista_saida, name='lista_saida'),
     path('criar_fatura/<int:id_saida>/', views.criar_fatura, name='criar_fatura'),
 
+    #------------------- MÃO DE OBRA ----------------------#
     path('mao_obra/', lista_MaoDeObra, name='lista_MaoDeObra'),
+    path('mao-de-obra/<int:id_mao_de_obra>/', views.ver_mao_de_obra, name='ver_mao_de_obra'),
     path('mao_obra/adicionar', adicionar_mao_de_obra, name='adicionar_mao_de_obra'),
-    path('mao_obra/<int:id_mao_de_obra>/', ver_MaoDeObra, name='ver_MaoDeObra'),
-
+    path('mao_de_obra/<int:id_mao_de_obra>/editar/', views.editar_mao_de_obra, name='editar_mao_de_obra'),
+    path('mao_de_obra/<int:id_mao_de_obra>/deletar/', views.deletar_mao_de_obra, name='deletar_mao_de_obra'),
 
 
     path('reparacoes/', reparacoes, name='reparacoes'),

@@ -8,6 +8,7 @@ import json
 from django.core.paginator import Paginator
 from django.contrib import messages
 import json
+from django.urls import reverse
 
 
 def dashboard(request):
@@ -215,6 +216,7 @@ def lista_saida(request):
 
     return render(request, 'faturas/lista_saida.html', context)
 
+#--------------------- MÃO DE OBRA --------------------------#
 
 def adicionar_mao_de_obra(request):
     if request.method == 'POST':
@@ -302,9 +304,79 @@ def lista_MaoDeObra(request):
         'sort_order': sort_order
     })
 
-def ver_MaoDeObra(request, id_mao_de_obra):
-    maoDeObra = get_object_or_404(MaoDeObra, id_mao_de_obra=id_mao_de_obra)
-    return render(request, 'MaoDeObra/ver_MaoDeObra.html', {'maoDeObra':  maoDeObra})
+def ver_mao_de_obra(request, id_mao_de_obra):
+    with connection.cursor() as cursor:
+        # Chamando a função SQL que criamos
+        cursor.execute("SELECT * FROM get_mao_de_obra_details(%s)", [id_mao_de_obra])
+        resultado = cursor.fetchone()
+
+        if resultado:
+            # Desempacotando os resultados
+            mao_de_obra_detalhes = {
+                'id_mao_de_obra': id_mao_de_obra,
+                'nome': resultado[0],
+                'valor': resultado[1],
+                'usuario_nome': resultado[2],
+                'usuario_nif': resultado[3],
+                'especialidade_nome': resultado[4],
+            }
+        else:
+            # Caso a mão de obra não seja encontrada
+            mao_de_obra_detalhes = None
+    return render(request, 'mao_de_obra/ver_mao.html', {'mao_de_obra': mao_de_obra_detalhes})
+
+def editar_mao_de_obra(request, id_mao_de_obra):
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        valor = request.POST.get('valor')
+        usuario_id = request.POST.get('usuario_id')
+
+        # Chamar o procedimento para atualizar a mão de obra
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                CALL atualizar_mao_de_obra(%s, %s, %s, %s)
+                """,
+                [id_mao_de_obra, nome, valor, usuario_id]
+            )
+
+        return redirect(reverse('app_bd2:ver_mao_de_obra', args=[id_mao_de_obra]))
+
+    # Recuperar os detalhes da mão de obra
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM get_mao_de_obra_details(%s)", [id_mao_de_obra])
+        resultado = cursor.fetchone()
+
+        if resultado:
+            mao_de_obra_detalhes = {
+                'id_mao_de_obra': id_mao_de_obra,
+                'nome': resultado[0],
+                'valor': resultado[1],
+                'usuario_id': resultado[2],
+                'usuario_nome': resultado[3],
+                'usuario_nif': resultado[4],
+                'especialidade_nome': resultado[5],
+            }
+        else:
+            return redirect('app_bd2:lista_MaoDeObra')  # Redireciona se não encontrar a mão de obra
+
+    # Listar todos os usuários com especialidades
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id_usuarios, nome, especialidade FROM listar_usuarios_com_especialidade()")
+        usuarios = cursor.fetchall()
+
+    return render(request, 'mao_de_obra/editar_mao_de_obra.html', {
+        'mao_de_obra': mao_de_obra_detalhes,
+        'usuarios': usuarios
+    })
+
+def deletar_mao_de_obra(request, id_mao_de_obra):
+    mao_de_obra = get_object_or_404(MaoDeObra, pk=id_mao_de_obra)
+    if request.method == 'POST':
+        mao_de_obra.delete()
+        messages.success(request, 'Mão de obra deletada com sucesso.')
+        return redirect('app_bd2:lista_MaoDeObra')
+    return render(request, 'mao_de_obra/confirmar_deletar.html', {'mao_de_obra': mao_de_obra})
 
 
 def reparacoes(request):
