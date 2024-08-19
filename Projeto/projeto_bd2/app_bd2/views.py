@@ -14,6 +14,8 @@ from django.urls import reverse
 def dashboard(request):
     return render(request, 'dashboard.html', {'page_title': 'Dashboard'})
 
+# ------------------------ CLIENTES -------------------------- #
+
 def clientes(request):
     with connection.cursor() as cursor:
         cursor.execute("""
@@ -107,7 +109,32 @@ def ver_cliente(request, id):
 
     return render(request, 'clientes/ver_cliente.html', {'cliente': cliente, 'page_title': 'Ver Cliente'})
 
+# ------------------------ ENCARREGADOS -------------------------- #
 
+def encarregados(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT usuarios.id_usuarios, usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel
+                FROM usuarios 
+                    JOIN auth_user ON usuarios.user_id = auth_user.id 
+                    JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
+                    JOIN auth_group ON auth_user_groups.group_id = auth_group.id
+                WHERE auth_group.name = 'Trabalhador'
+        """)
+        resultados = cursor.fetchall()
+
+    encarregados = []
+
+    for row in resultados:
+        encarregados.append({
+            'id_usuarios': row[0],  
+            'nome': row[1],
+            'nif': row[2],
+            'email': row[3],
+            'telemovel': row[4],
+        })
+
+    return render(request, 'encarregados/lista_encarregados.html', {'encarregados': encarregados, 'page_title': 'Lista de Encarregados'})
 
 # ------------------------ FATURAS -------------------------- #
 
