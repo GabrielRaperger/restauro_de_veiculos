@@ -57,25 +57,11 @@
             <div class="sidebar-heading text-white">Menu</div>
             <div class="list-group list-group-flush">
                 <a href="{% url 'app_bd2:dashboard' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-home"></i> Início</a>
-                <div class="dropdown">
-                    <a href="#" class="list-group-item list-group-item-action bg-dark text-white dropdown-toggle" id="dropdownVeiculos" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-tags"></i> Veículos
-                    </a>
-                    <div class="dropdown-menu bg-dark" aria-labelledby="dropdownVeiculos">
-                        <a href="{% url 'app_bd2:veiculos' %}" class="dropdown-item bg-dark text-white">
-                            <i class="fas fa-list"></i> Veículos
-                        </a>
-                        <a href="{% url 'app_bd2:veiculos' %}" class="dropdown-item bg-dark text-white">
-                            <i class="fas fa-car-side"></i> Entrada de Veículos
-                        </a>
-                        <a href="{% url 'app_bd2:veiculos' %}" class="dropdown-item bg-dark text-white">
-                            <i class="fas fa-car-crash"></i> Saída de Veículos
-                        </a>
-                    </div>
-                </div>
+                <a href="{% url 'app_bd2:veiculos' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-box"></i> Veiculos</a>
                 
                 <a href="{% url 'app_bd2:reparacoes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-box"></i> Reparações</a>
                 <a href="{% url 'app_bd2:clientes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-list"></i> Clientes</a>
+                <a href="{% url 'app_bd2:reparacoes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-box"></i> Encarregados</a>
                 <a href="{% url 'app_bd2:lista_faturas' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-info-circle"></i> Faturas</a>
                 <a href="{% url 'app_bd2:lista_MaoDeObra' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-info-circle"></i> Mão de Obra</a>
                 
