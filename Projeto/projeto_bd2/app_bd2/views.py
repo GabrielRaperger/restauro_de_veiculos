@@ -137,10 +137,76 @@ def encarregados(request):
     return render(request, 'encarregados/lista_encarregados.html', {'encarregados': encarregados, 'page_title': 'Lista de Encarregados'})
 
 def adicionar_encarregado(request):
-    return render(request, 'encarregados/adicionar_encarregado.html')
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, nome FROM mao_de_obra")
+        mao_de_obras = cursor.fetchall()
 
-def ver_encarregado(request):
-    return render(request, 'encarregados/ver_encarregado.html')
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO usuarios (nome, nif, email, telemovel, endereco, user_id)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, [
+                request.POST['nome'],
+                request.POST['nif'],
+                request.POST['email'],
+                request.POST['telemovel'],
+                request.POST['endereco'],
+                request.POST['user_id'] 
+            ])
+
+        return redirect('listar_encarregados')
+
+    return render(request, 'encarregados/adicionar_encarregado.html', {
+        'mao_de_obras': mao_de_obras,
+        'page_title': 'Adicionar Encarregado'
+    })
+
+
+def ver_encarregado(request, id):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT u.nome, u.nif, u.email, u.telemovel, u.endereco
+            FROM usuarios u
+            WHERE u.id_usuarios = %s
+        """, [id])
+        resultado = cursor.fetchone()
+
+    if resultado:
+        encarregado = {
+            'id': id,
+            'nome': resultado[0],
+            'nif': resultado[1],
+            'email': resultado[2],
+            'telemovel': resultado[3],
+            'endereco': resultado[4],
+        }
+    else:
+        return redirect('listar_encarregados')
+
+    if request.method == 'POST':
+        if 'update' in request.POST:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE usuarios
+                    SET nome = %s, nif = %s, email = %s, telemovel = %s, endereco = %s
+                    WHERE id_usuarios = %s
+                """, [
+                    request.POST['nome'],
+                    request.POST['nif'],
+                    request.POST['email'],
+                    request.POST['telemovel'],
+                    request.POST['endereco'],
+                    id
+                ])
+            return redirect('listar_encarregados')
+        elif 'delete' in request.POST:
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM usuarios WHERE id_usuarios = %s", [id])
+            return redirect('listar_encarregados')
+
+    return render(request, 'encarregados/ver_encarregado.html', {'encarregado': encarregado, 'page_title': 'Ver Encarregado'})
+
 
 # ------------------------ FATURAS -------------------------- #
 
