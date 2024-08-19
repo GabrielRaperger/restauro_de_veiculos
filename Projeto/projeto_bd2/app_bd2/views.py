@@ -136,6 +136,12 @@ def encarregados(request):
 
     return render(request, 'encarregados/lista_encarregados.html', {'encarregados': encarregados, 'page_title': 'Lista de Encarregados'})
 
+def adicionar_encarregado(request):
+    return render(request, 'encarregados/adicionar_encarregado.html')
+
+def ver_encarregado(request):
+    return render(request, 'encarregados/ver_encarregado.html')
+
 # ------------------------ FATURAS -------------------------- #
 
 def criar_fatura(request, id_saida):
