@@ -28,7 +28,7 @@ VALUES
 
 -- Inserir dados na tabela usuarios com IDs manuais
 INSERT INTO usuarios (id_usuarios, nome, nif, telemovel, endereco, email) 
-VALUES 
+VALUES
 (1, 'João Silva', '123456789', '912345678', 'Rua A, 123', 'joao.silva@example.com'),
 (2, 'Maria Oliveira', '234567890', '923456789', 'Rua B, 456', 'maria.oliveira@example.com'),
 (3, 'Pedro Santos', '345678901', '934567890', 'Rua C, 789', 'pedro.santos@example.com'),
@@ -38,7 +38,17 @@ VALUES
 (7, 'Ricardo Lima', '789012345', '978901234', 'Rua G, 901', 'ricardo.lima@example.com'),
 (8, 'Fernanda Silva', '890123456', '989012345', 'Rua H, 234', 'fernanda.silva@example.com'),
 (9, 'Gustavo Rocha', '901234567', '990123456', 'Rua I, 567', 'gustavo.rocha@example.com'),
-(10, 'Larissa Fernandes', '012345678', '991234567', 'Rua J, 890', 'larissa.fernandes@example.com');
+(10, 'Larissa Fernandes', '012345678', '991234567', 'Rua J, 890', 'larissa.fernandes@example.com'),
+(11, 'Helena Ribeiro', '112233445', '912345111', 'Rua K, 101', 'helena.ribeiro@example.com'),
+(12, 'Fábio Marques', '223344556', '923456222', 'Rua L, 202', 'fabio.marques@example.com'),
+(13, 'Tatiana Sousa', '334455667', '934567333', 'Rua M, 303', 'tatiana.sousa@example.com'),
+(14, 'Diogo Carvalho', '445566778', '945678444', 'Rua N, 404', 'diogo.carvalho@example.com'),
+(15, 'Mariana Nunes', '556677889', '956789555', 'Rua O, 505', 'mariana.nunes@example.com'),
+(16, 'Leonardo Ramos', '667788990', '967890666', 'Rua P, 606', 'leonardo.ramos@example.com'),
+(17, 'Patrícia Mendes', '778899001', '978901777', 'Rua Q, 707', 'patricia.mendes@example.com'),
+(18, 'Tiago Lopes', '889900112', '989012888', 'Rua R, 808', 'tiago.lopes@example.com'),
+(19, 'Sara Costa', '990011223', '990123999', 'Rua S, 909', 'sara.costa@example.com'),
+(20, 'Bruno Teixeira', '101122334', '991234000', 'Rua T, 010', 'bruno.teixeira@example.com');
 
 -- Inserir dados na tabela veiculo com IDs manuais
 INSERT INTO veiculo (id_veiculo, id_marca, id_usuarios) 

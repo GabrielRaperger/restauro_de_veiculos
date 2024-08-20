@@ -32,7 +32,7 @@ class Command(BaseCommand):
                 last_name='User'
             )
             self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address', next_id_usuarios)
-            next_id_usuarios += 1  # Incrementar o ID para o próximo usuário
+            next_id_usuarios += 1  
             self.stdout.write(self.style.SUCCESS('Superuser criado com sucesso'))
         else:
             self.stdout.write(self.style.WARNING('Superuser já existe'))
@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 group = Group.objects.get(name=group_name)
                 user.groups.add(group)
                 self._create_usuario_entry(user, f'{first_name} {last_name}', nif, telemovel, endereco, next_id_usuarios)
-                next_id_usuarios += 1  # Incrementar o ID para o próximo usuário
+                next_id_usuarios += 1  
                 self.stdout.write(self.style.SUCCESS(f'Utilizador "{username}" criado e adicionado ao grupo "{group_name}"'))
             else:
                 self.stdout.write(self.style.WARNING(f'Utilizador "{username}" já existe'))
