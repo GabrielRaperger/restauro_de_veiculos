@@ -1,8 +1,31 @@
+{% extends "menu.html" %}
 
-<h2>Adicionar Cliente</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Adicionar Cliente</button>
-</form>
-<a href="{% url 'app_bd2:clientes' %}" class="btn btn-secondary mt-2">Voltar à lista de clientes</a>
+{% block title %}Adicionar Cliente - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="clientes-table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Adicionar Cliente</h2>
+        <a href="{% url 'app_bd2:clientes' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista de Clientes
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Formulário de Adição de Cliente
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Adicionar Cliente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
