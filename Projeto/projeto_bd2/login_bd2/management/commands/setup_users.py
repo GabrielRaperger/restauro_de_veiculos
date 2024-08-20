@@ -18,9 +18,6 @@ class Command(BaseCommand):
         # Criar a chave estrangeira entre auth_user e usuarios
         self._create_foreign_key()
 
-        # ID inicial para o campo id_usuarios
-        next_id_usuarios = 21
-
         # Criar Superuser
         self.stdout.write('A criar um superuser...')
         if not User.objects.filter(username='admin').exists():
@@ -31,6 +28,8 @@ class Command(BaseCommand):
                 first_name='Admin',
                 last_name='User'
             )
+
+            next_id_usuarios = 21
             self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address', next_id_usuarios)
             next_id_usuarios += 1  
             self.stdout.write(self.style.SUCCESS('Superuser criado com sucesso'))
@@ -38,40 +37,11 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('Superuser já existe'))
 
         # Criar Grupos
-        self.stdout.write('A criar os grupos...')
-        groups = ['Admin', 'Cliente', 'Trabalhador']
-        for group_name in groups:
-            if not Group.objects.filter(name=group_name).exists():
-                Group.objects.create(name=group_name)
-                self.stdout.write(self.style.SUCCESS(f'Grupo "{group_name}" criado com sucesso'))
-            else:
-                self.stdout.write(self.style.WARNING(f'Grupo "{group_name}" já existe'))
+        self._create_groups()
 
-        # Criar Utilizadores
-        self.stdout.write('A criar utilizadores...')
-        users_info = [
-            ('cliente', 'cliente@django.com', 'clientepassword', 'Cliente', 'Client', '999888777', '123456789', 'Client Address'),
-            ('trabalhador', 'trabalhador@django.com', 'trabalhadorpassword', 'Worker', 'Work', '111222333', '987654321', 'Worker Address')
-        ]
-
-        for username, email, password, first_name, last_name, nif, telemovel, endereco in users_info:
-            if not User.objects.filter(username=username).exists():
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    first_name=first_name,
-                    last_name=last_name
-                )
-                group_name = 'Cliente' if 'cliente' in username else 'Trabalhador'
-                group = Group.objects.get(name=group_name)
-                user.groups.add(group)
-                self._create_usuario_entry(user, f'{first_name} {last_name}', nif, telemovel, endereco, next_id_usuarios)
-                next_id_usuarios += 1  
-                self.stdout.write(self.style.SUCCESS(f'Utilizador "{username}" criado e adicionado ao grupo "{group_name}"'))
-            else:
-                self.stdout.write(self.style.WARNING(f'Utilizador "{username}" já existe'))
-
+        # Associar usuários existentes ao auth_user e grupos
+        self.stdout.write('Associando usuários existentes ao auth_user e grupos...')
+        self._associate_users_with_auth_user()
         self.stdout.write(self.style.SUCCESS('Script executado com sucesso'))
 
     def _add_user_id_column(self):
@@ -79,14 +49,12 @@ class Command(BaseCommand):
             cursor.execute("""
                 DO $$
                 BEGIN
-                    -- Verificar se a coluna user_id já existe
                     IF NOT EXISTS (
                         SELECT 1 
                         FROM information_schema.columns 
                         WHERE table_name = 'usuarios' 
                         AND column_name = 'user_id'
                     ) THEN
-                        -- Adicionar a coluna user_id
                         ALTER TABLE usuarios
                         ADD COLUMN user_id INTEGER;
                     END IF;
@@ -99,7 +67,6 @@ class Command(BaseCommand):
             cursor.execute("""
                 DO $$
                 BEGIN
-                    -- Verificar se a chave estrangeira já existe
                     IF NOT EXISTS (
                         SELECT 1 
                         FROM information_schema.table_constraints 
@@ -107,7 +74,6 @@ class Command(BaseCommand):
                         AND table_name = 'usuarios' 
                         AND constraint_name = 'usuarios_user_id_fkey'
                     ) THEN
-                        -- Adicionar a chave estrangeira
                         ALTER TABLE usuarios
                         ADD CONSTRAINT usuarios_user_id_fkey
                         FOREIGN KEY (user_id)
@@ -116,6 +82,43 @@ class Command(BaseCommand):
                 END $$;
             """)
             self.stdout.write(self.style.SUCCESS('Chave estrangeira entre auth_user e usuarios criada com sucesso'))
+
+    def _create_groups(self):
+        self.stdout.write('A criar os grupos...')
+        groups = ['Trabalhador', 'Cliente']
+        for group_name in groups:
+            if not Group.objects.filter(name=group_name).exists():
+                Group.objects.create(name=group_name)
+                self.stdout.write(self.style.SUCCESS(f'Grupo "{group_name}" criado com sucesso'))
+            else:
+                self.stdout.write(self.style.WARNING(f'Grupo "{group_name}" já existe'))
+
+    def _associate_users_with_auth_user(self):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_usuarios, nome, email FROM usuarios ORDER BY id_usuarios ASC")
+            users = cursor.fetchall()
+
+            for i, user_data in enumerate(users):
+                id_usuarios, nome, email = user_data
+                first_name, last_name = nome.split(' ', 1) if ' ' in nome else (nome, '')
+
+                if not User.objects.filter(username=email).exists():
+                    user = User.objects.create_user(
+                        username=email,
+                        email=email,
+                        password='defaultpassword',
+                        first_name=first_name,
+                        last_name=last_name
+                    )
+                    group_name = 'Trabalhador' if i < 10 else 'Cliente'
+                    group = Group.objects.get(name=group_name)
+                    user.groups.add(group)
+
+                    # Atualizar a tabela usuarios com o user_id do auth_user
+                    cursor.execute("UPDATE usuarios SET user_id = %s WHERE id_usuarios = %s", [user.id, id_usuarios])
+                    self.stdout.write(self.style.SUCCESS(f'Usuário "{nome}" associado ao grupo "{group_name}" e auth_user'))
+                else:
+                    self.stdout.write(self.style.WARNING(f'Usuário "{nome}" já está associado no auth_user'))
 
     def _create_usuario_entry(self, user, nome, nif, telemovel, endereco, id_usuarios):
         with connection.cursor() as cursor:
