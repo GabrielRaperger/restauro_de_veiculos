@@ -35,9 +35,6 @@ BEGIN
 END;
 $$;
 
-SELECT * FROM auth_user;
-SELECT * FROM usuarios;
-
 ---------------------------------- FATURAS -----------------------------------------
 
 CREATE OR REPLACE FUNCTION calcular_valor_fatura() 

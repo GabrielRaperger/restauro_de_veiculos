@@ -18,6 +18,9 @@ class Command(BaseCommand):
         # Criar a chave estrangeira entre auth_user e usuarios
         self._create_foreign_key()
 
+        # ID inicial para o campo id_usuarios
+        next_id_usuarios = 21
+
         # Criar Superuser
         self.stdout.write('A criar um superuser...')
         if not User.objects.filter(username='admin').exists():
@@ -28,7 +31,8 @@ class Command(BaseCommand):
                 first_name='Admin',
                 last_name='User'
             )
-            self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address')
+            self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address', next_id_usuarios)
+            next_id_usuarios += 1  # Incrementar o ID para o próximo usuário
             self.stdout.write(self.style.SUCCESS('Superuser criado com sucesso'))
         else:
             self.stdout.write(self.style.WARNING('Superuser já existe'))
@@ -62,7 +66,8 @@ class Command(BaseCommand):
                 group_name = 'Cliente' if 'cliente' in username else 'Trabalhador'
                 group = Group.objects.get(name=group_name)
                 user.groups.add(group)
-                self._create_usuario_entry(user, f'{first_name} {last_name}', nif, telemovel, endereco)
+                self._create_usuario_entry(user, f'{first_name} {last_name}', nif, telemovel, endereco, next_id_usuarios)
+                next_id_usuarios += 1  # Incrementar o ID para o próximo usuário
                 self.stdout.write(self.style.SUCCESS(f'Utilizador "{username}" criado e adicionado ao grupo "{group_name}"'))
             else:
                 self.stdout.write(self.style.WARNING(f'Utilizador "{username}" já existe'))
@@ -112,12 +117,12 @@ class Command(BaseCommand):
             """)
             self.stdout.write(self.style.SUCCESS('Chave estrangeira entre auth_user e usuarios criada com sucesso'))
 
-    def _create_usuario_entry(self, user, nome, nif, telemovel, endereco):
+    def _create_usuario_entry(self, user, nome, nif, telemovel, endereco, id_usuarios):
         with connection.cursor() as cursor:
             try:
                 cursor.execute(
-                    "INSERT INTO usuarios (nome, nif, telemovel, endereco, email, user_id) VALUES (%s, %s, %s, %s, %s, %s)",
-                    [nome, nif, telemovel, endereco, user.email, user.id]
+                    "INSERT INTO usuarios (id_usuarios, nome, nif, telemovel, endereco, email, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    [id_usuarios, nome, nif, telemovel, endereco, user.email, user.id]
                 )
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'Erro ao inserir dados na tabela usuarios: {e}'))
