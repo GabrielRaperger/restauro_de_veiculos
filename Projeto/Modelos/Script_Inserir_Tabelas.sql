@@ -53,16 +53,16 @@ VALUES
 -- Inserir dados na tabela veiculo com IDs manuais
 INSERT INTO veiculo (id_veiculo, id_marca, id_usuarios) 
 VALUES 
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 3),
-(4, 4, 4),
-(5, 5, 5),
-(6, 6, 6),
-(7, 7, 7),
-(8, 8, 8),
-(9, 9, 9),
-(10, 10, 10);
+(1, 1, 11),
+(2, 2, 12),
+(3, 3, 13),
+(4, 4, 14),
+(5, 5, 15),
+(6, 6, 16),
+(7, 7, 17),
+(8, 8, 18),
+(9, 9, 19),
+(10, 10, 20);
 
 -- Inserir dados na tabela entrada com IDs manuais e datas variadas
 INSERT INTO entrada (id_entrada, id_veiculo, data) 

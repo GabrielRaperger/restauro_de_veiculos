@@ -1,6 +1,6 @@
 -- Objetos Lógicos
 
----
+------------------------------ SEQUENCE USUARIOS -----------------------------------------
 CREATE SEQUENCE usuarios_id_seq
     START WITH 22
     INCREMENT BY 1
@@ -11,7 +11,6 @@ CREATE SEQUENCE usuarios_id_seq
 ALTER TABLE usuarios
 ALTER COLUMN id_usuarios SET DEFAULT nextval('usuarios_id_seq');
 
-SELECT * FROM usuarios
 ---------------------------------- CLIENTES -----------------------------------------
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
