@@ -89,6 +89,20 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE proc_eliminar_encarregado(p_user_id INTEGER)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM especialidade_usuarios WHERE id_usuarios = (SELECT id_usuarios FROM usuarios WHERE user_id = p_user_id);
+
+    DELETE FROM auth_user_groups WHERE user_id = p_user_id;
+
+    DELETE FROM usuarios WHERE user_id = p_user_id;
+
+    DELETE FROM auth_user WHERE id = p_user_id;
+END;
+$$;
+
 ---------------------------------- FATURAS -----------------------------------------
 
 CREATE OR REPLACE FUNCTION calcular_valor_fatura() 

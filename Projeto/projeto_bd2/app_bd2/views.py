@@ -174,7 +174,7 @@ def adicionar_encarregado(request):
 def ver_encarregado(request, id):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT u.nome, u.nif, u.email, u.telemovel, u.endereco, e.id_especialidade
+            SELECT u.nome, u.nif, u.email, u.telemovel, u.endereco, e.id_especialidade, u.user_id
             FROM usuarios u
             LEFT JOIN especialidade_usuarios e ON u.id_usuarios = e.id_usuarios
             WHERE u.id_usuarios = %s
@@ -190,6 +190,7 @@ def ver_encarregado(request, id):
             'telemovel': resultado[3],
             'endereco': resultado[4],
             'especialidade_id': resultado[5],
+            'user_id': resultado[6],  
         }
     else:
         return redirect('app_bd2:encarregados')  
@@ -221,8 +222,7 @@ def ver_encarregado(request, id):
             return redirect('app_bd2:encarregados')
         elif 'delete' in request.POST:
             with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM especialidade_usuarios WHERE id_usuarios = %s", [id])
-                cursor.execute("DELETE FROM usuarios WHERE id_usuarios = %s", [id])
+                cursor.execute("CALL proc_eliminar_encarregado(%s);", [encarregado['user_id']])
             return redirect('app_bd2:encarregados')
 
     with connection.cursor() as cursor:
@@ -233,6 +233,7 @@ def ver_encarregado(request, id):
         'encarregado': encarregado,
         'especialidades': especialidades
     })
+
 
 # ------------------------ FATURAS -------------------------- #
 
