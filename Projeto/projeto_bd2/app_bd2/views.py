@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.shortcuts import render, get_object_or_404
 from django.db import connection
 from .forms.cliente import ClienteForm
+from .forms.encarregados import EncarregadoForm
 from .models import MaoDeObra
 from datetime import datetime
 import json
@@ -137,31 +138,38 @@ def encarregados(request):
     return render(request, 'encarregados/lista_encarregados.html', {'encarregados': encarregados, 'page_title': 'Lista de Encarregados'})
 
 def adicionar_encarregado(request):
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT id, nome FROM mao_de_obra")
-        mao_de_obras = cursor.fetchall()
-
     if request.method == 'POST':
         with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO usuarios (nome, nif, email, telemovel, endereco, user_id)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, [
-                request.POST['nome'],
-                request.POST['nif'],
-                request.POST['email'],
-                request.POST['telemovel'],
-                request.POST['endereco'],
-                request.POST['user_id'] 
-            ])
+            cursor.execute("SELECT id_especialidade, nome FROM especialidades")
+            especialidades = cursor.fetchall()
 
-        return redirect('listar_encarregados')
+        form = EncarregadoForm(request.POST, especialidades=especialidades)
 
-    return render(request, 'encarregados/adicionar_encarregado.html', {
-        'mao_de_obras': mao_de_obras,
-        'page_title': 'Adicionar Encarregado'
-    })
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            group_name = 'Trabalhador'
+            nif = form.cleaned_data.get('nif')
+            telemovel = form.cleaned_data.get('telemovel')
+            endereco = form.cleaned_data.get('endereco')
+            especialidade_id = form.cleaned_data['especialidade']
 
+            with connection.cursor() as cursor:
+                cursor.execute("CALL proc_inserir_encarregado(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", 
+                               [username, first_name, last_name, email, password, group_name, nif, telemovel, endereco, especialidade_id])
+
+            return redirect('app_bd2:encarregados')
+    else:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_especialidade, nome FROM especialidades")
+            especialidades = cursor.fetchall()
+
+        form = EncarregadoForm(especialidades=especialidades)
+
+    return render(request, 'encarregados/adicionar_encarregado.html', {'form': form})
 
 def ver_encarregado(request, id):
     with connection.cursor() as cursor:
@@ -206,7 +214,6 @@ def ver_encarregado(request, id):
             return redirect('listar_encarregados')
 
     return render(request, 'encarregados/ver_encarregado.html', {'encarregado': encarregado, 'page_title': 'Ver Encarregado'})
-
 
 # ------------------------ FATURAS -------------------------- #
 

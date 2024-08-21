@@ -1,5 +1,17 @@
 -- Objetos Lógicos
 
+---
+CREATE SEQUENCE usuarios_id_seq
+    START WITH 22
+    INCREMENT BY 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER TABLE usuarios
+ALTER COLUMN id_usuarios SET DEFAULT nextval('usuarios_id_seq');
+
+SELECT * FROM usuarios
 ---------------------------------- CLIENTES -----------------------------------------
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
@@ -32,6 +44,49 @@ BEGIN
     INSERT INTO usuarios (nome, nif, telemovel, endereco, email, user_id)
     VALUES (p_first_name || ' ' || p_last_name, p_nif, p_telemovel, p_endereco, p_email, v_user_id);
 
+END;
+$$;
+
+---------------------------------- ENCARREGADOS -----------------------------------------
+CREATE OR REPLACE PROCEDURE proc_inserir_encarregado(
+    p_username VARCHAR,
+    p_first_name VARCHAR,
+    p_last_name VARCHAR,
+    p_email VARCHAR,
+    p_password VARCHAR,
+    p_group_name VARCHAR,
+    p_nif VARCHAR,
+    p_telemovel VARCHAR,
+    p_endereco VARCHAR,
+    p_especialidade_id INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_user_id INTEGER;
+    v_group_id INTEGER;
+    v_id_usuarios INTEGER;
+BEGIN
+    -- Inserir na tabela auth_user
+    INSERT INTO auth_user (username, first_name, last_name, email, password, is_active, is_staff, is_superuser, date_joined)
+    VALUES (p_username, p_first_name, p_last_name, p_email, crypt(p_password, gen_salt('bf')), true, false, false, now())
+    RETURNING id INTO v_user_id;
+
+    -- Obter o id do grupo
+    SELECT id INTO v_group_id FROM auth_group WHERE name = p_group_name;
+
+    -- Associar o usuário ao grupo
+    INSERT INTO auth_user_groups (user_id, group_id)
+    VALUES (v_user_id, v_group_id);
+
+    -- Inserir na tabela usuarios e retornar o id_usuarios
+    INSERT INTO usuarios (nome, nif, telemovel, endereco, email, user_id)
+    VALUES (p_first_name || ' ' || p_last_name, p_nif, p_telemovel, p_endereco, p_email, v_user_id)
+    RETURNING id_usuarios INTO v_id_usuarios;
+
+    -- Inserir na tabela especialidade_usuarios
+    INSERT INTO especialidade_usuarios (id_especialidade, id_usuarios)
+    VALUES (p_especialidade_id, v_id_usuarios);
 END;
 $$;
 

@@ -1,1 +1,6 @@
-Adicionar encarregado
+<h2>Adicionar Encarregado</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Adicionar Encarregado</button>
+</form>
