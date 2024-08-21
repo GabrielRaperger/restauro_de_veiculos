@@ -113,9 +113,10 @@ class Command(BaseCommand):
                         first_name=first_name,
                         last_name=last_name
                     )
-                    group_name = 'Trabalhador' if i < 10 else 'Cliente'
-                    group = Group.objects.get(name=group_name)
-                    user.groups.add(group)
+                    group_name = 'Trabalhador' if i < 10 else 'Cliente' if i < 20 else 'Administrador'
+                    if group_name:
+                        group = Group.objects.get(name=group_name)
+                        user.groups.add(group)
 
                     cursor.execute("UPDATE usuarios SET user_id = %s WHERE id_usuarios = %s", [user.id, id_usuarios])
                     self.stdout.write(self.style.SUCCESS(f'Usuário "{nome}" associado ao grupo "{group_name}" e auth_user'))
