@@ -52,7 +52,7 @@ CREATE TABLE faturas (
     valor_total NUMERIC
 );
 
-CREATE TABLE especialidade_mao (
+CREATE TABLE especialidades (
     id_especialidade SERIAL PRIMARY KEY,
     nome VARCHAR(30) NOT NULL
 );
@@ -76,7 +76,7 @@ CREATE TABLE mao_restauro (
 );
 
 CREATE TABLE especialidade_usuarios (
-    id_especialidade INTEGER REFERENCES especialidade_mao(id_especialidade),
+    id_especialidade INTEGER REFERENCES especialidades(id_especialidade),
     id_usuarios INTEGER REFERENCES usuarios(id_usuarios),
     PRIMARY KEY (id_especialidade, id_usuarios)
 );

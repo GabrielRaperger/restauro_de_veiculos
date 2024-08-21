@@ -31,11 +31,8 @@
                 <td>{{ encarregado.email }}</td>
                 <td>{{ encarregado.telemovel }}</td>
                 <td>
-                    <a href="#" class="btn btn-info btn-icon btn-car">
-                        <i class="fas fa-car"></i> Carro
-                    </a>
                     <a href="{% url 'app_bd2:ver_faturas' 1 %}" class="btn btn-primary btn-icon btn-view">
-                        <i class="fas fa-file-invoice"></i> Faturas
+                        <i class="fas fa-file-invoice"></i> Reparações
                     </a>
                     {% if encarregado.id_usuarios %}
                         <a href="{% url 'app_bd2:ver_encarregado' encarregado.id_usuarios %}" class="btn btn-primary btn-icon btn-view">

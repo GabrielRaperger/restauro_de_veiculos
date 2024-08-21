@@ -116,6 +116,31 @@ VALUES
 (9, 9, 'Reparo de Radiador', 999.99),
 (10, 10, 'Troca de Escapamento', 1000.00);
 
+INSERT INTO especialidades (nome) VALUES 
+('Pintura Automotiva'),
+('Restauração de Interior'),
+('Mecânica Geral'),
+('Restauração de Motores'),
+('Funilaria'),
+('Elétrica Automotiva'),
+('Tapeçaria Automotiva'),
+('Estofamento e Couro'),
+('Polimento e Detalhamento'),
+('Restauração de Carros Antigos');
+
+INSERT INTO especialidade_usuarios (id_especialidade, id_usuarios) VALUES 
+(1, 1),  -- Usuário 1 é especialista em Pintura Automotiva
+(2, 2),  -- Usuário 2 é especialista em Restauração de Interior
+(3, 3),  -- Usuário 3 é especialista em Mecânica Geral
+(4, 4),  -- Usuário 4 é especialista em Restauração de Motores
+(5, 5),  -- Usuário 5 é especialista em Funilaria
+(6, 6),  -- Usuário 6 é especialista em Elétrica Automotiva
+(7, 7),  -- Usuário 7 é especialista em Tapeçaria Automotiva
+(8, 8),  -- Usuário 8 é especialista em Estofamento e Couro
+(9, 9),  -- Usuário 9 é especialista em Polimento e Detalhamento
+(10, 10); -- Usuário 10 é especialista em Restauração de Carros Antigos
+
+
 -- Inserir dados na tabela mao_restauro com IDs manuais
 INSERT INTO mao_restauro (id_mao_de_obra, id_restauro) 
 VALUES 

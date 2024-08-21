@@ -1,28 +1,75 @@
-<div class="container">
-    <h2>{{ cliente.nome }}</h2>
+{% extends "menu.html" %}
+
+{% block title %}Editar Cliente - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="clientes-detalhes-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Ver / Editar Cliente</h2>
+        <a href="{% url 'app_bd2:clientes' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
     <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="nome">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" value="{{ cliente.nome }}">
+        <div class="card">
+            <div class="card-header">
+                Preencha os detalhes abaixo
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" class="form-control" id="nome" name="nome" value="{{ cliente.nome }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="nif">NIF</label>
+                    <input type="text" class="form-control" id="nif" name="nif" value="{{ cliente.nif }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="telemovel">Telemóvel</label>
+                    <input type="text" class="form-control" id="telemovel" name="telemovel" value="{{ cliente.telemovel }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="endereco">Endereço</label>
+                    <input type="text" class="form-control" id="endereco" name="endereco" value="{{ cliente.endereco }}" required>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" name="update" class="btn btn-primary">Salvar Alterações</button>
+                    <button type="submit" name="delete" class="btn btn-danger">Eliminar Cliente</button>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="nif">NIF</label>
-            <input type="text" class="form-control" id="nif" name="nif" value="{{ cliente.nif }}">
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email }}">
-        </div>
-        <div class="form-group">
-            <label for="telemovel">Telemovel</label>
-            <input type="text" class="form-control" id="telemovel" name="telemovel" value="{{ cliente.telemovel }}">
-        </div>
-        <div class="form-group">
-            <label for="endereco">Endereço</label>
-            <input type="text" class="form-control" id="endereco" name="endereco" value="{{ cliente.endereco }}">
-        </div>
-        <button type="submit" name="update" class="btn btn-primary">Salvar Alterações</button>
-        <button type="submit" name="delete" class="btn btn-danger">Eliminar Cliente</button>
     </form>
 </div>
+
+<style>
+    .clientes-detalhes-container {
+        padding: 20px;
+    }
+
+    .card {
+        margin-top: 20px;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-primary, .btn-danger {
+        margin: 0 5px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

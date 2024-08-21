@@ -220,21 +220,30 @@ def criar_fatura(request, id_saida):
     return redirect('app_bd2:ver_faturas', id_faturas=id_faturas)
 
 def lista_faturas(request):
-    search_query = request.GET.get('search', '')  # Obtém o termo de pesquisa
-    
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort_by', 'id_faturas')  # Valor padrão para ordenação
+    sort_order = 'ASC'  # Forçar sempre crescente
+
+    # Definir o campo de ordenação
+    sort_by = sort_by if sort_by in ['id_faturas', 'data_emissao', 'valor_total', 'nome_cliente', 'nif_cliente'] else 'id_faturas'
+
+    # Consulta SQL com ordenação crescente
+    query = f"""
+        SELECT * FROM listar_faturas()
+        ORDER BY {sort_by} {sort_order}
+    """
+
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM listar_faturas()")
+        cursor.execute(query)
         resultados = cursor.fetchall()
     
-    # Filtrando resultados
     faturas = []
     for row in resultados:
         if search_query.lower() in str(row).lower():
-            # Se data_emissao for um datetime, apenas formate-o
             if isinstance(row[5], datetime):
                 data_emissao_formatada = row[5].strftime("%d de %B de %Y, %H:%M")
             else:
-                data_emissao_formatada = row[5]  # Se já estiver formatada corretamente
+                data_emissao_formatada = row[5]
             
             faturas.append({
                 'id_faturas': row[0],
@@ -246,16 +255,15 @@ def lista_faturas(request):
                 'valor_total': row[6],
             })
 
-    # Configuração da paginação
-    paginator = Paginator(faturas, 8)  # Exibe 8 faturas por página
-    page_number = request.GET.get('page')  # Obtém o número da página da URL
+    paginator = Paginator(faturas, 8)
+    page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     return render(request, 'faturas/lista_faturas.html', {
         'page_obj': page_obj,
         'search_query': search_query,
-        'sort_by': request.GET.get('sort_by', ''),
-        'sort_order': request.GET.get('sort_order', 'asc')
+        'sort_by': sort_by,
+        'sort_order': sort_order
     })
 
 def ver_faturas(request, id_faturas):
@@ -340,7 +348,7 @@ def adicionar_mao_de_obra(request):
     # Obter os usuários com especialidades usando a função SQL definida
     try:
         with connection.cursor() as cursor:
-            cursor.callproc('listar_usuarios_com_especialidade')
+            cursor.callproc('listar_trabalhadores_com_especialidade')
             usuarios = cursor.fetchall()
         
         # Convertemos o resultado para um formato de lista de dicionários para passar para o template
@@ -454,14 +462,14 @@ def editar_mao_de_obra(request, id_mao_de_obra):
                 'usuario_id': resultado[2],
                 'usuario_nome': resultado[3],
                 'usuario_nif': resultado[4],
-                'especialidade_nome': resultado[5],
+                 'especialidade_nome': resultado[5] if len(resultado) > 5 else None,
             }
         else:
             return redirect('app_bd2:lista_MaoDeObra')  # Redireciona se não encontrar a mão de obra
 
     # Listar todos os usuários com especialidades
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id_usuarios, nome, especialidade FROM listar_usuarios_com_especialidade()")
+        cursor.execute("SELECT id_usuarios, nome, especialidade FROM listar_trabalhadores_com_especialidade()")
         usuarios = cursor.fetchall()
 
     return render(request, 'mao_de_obra/editar_mao_de_obra.html', {

@@ -236,16 +236,21 @@ $$ LANGUAGE plpgsql;
 
 
 -------------------------------- MAO DE OBRA ------------------------------------
-CREATE OR REPLACE FUNCTION listar_usuarios_com_especialidade()
+CREATE OR REPLACE FUNCTION listar_trabalhadores_com_especialidade()
 RETURNS TABLE (id_usuarios INT, nome TEXT, especialidade TEXT) AS $$
 BEGIN
     RETURN QUERY
     SELECT u.id_usuarios, u.nome::TEXT, e.nome::TEXT
     FROM usuarios u
     JOIN especialidade_usuarios eu ON u.id_usuarios = eu.id_usuarios
-    JOIN especialidade_mao e ON eu.id_especialidade = e.id_especialidade;
+    JOIN especialidades e ON eu.id_especialidade = e.id_especialidade
+    JOIN auth_user au ON u.user_id = au.id
+    JOIN auth_user_groups aug ON au.id = aug.user_id
+    JOIN auth_group ag ON aug.group_id = ag.id
+    WHERE ag.name = 'Trabalhador';
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION adicionar_mao_de_obra(
     p_id_usuario INT,
@@ -306,7 +311,7 @@ BEGIN
     LEFT JOIN 
         especialidade_usuarios eu ON u.id_usuarios = eu.id_usuarios
     LEFT JOIN 
-        especialidade_mao e ON eu.id_especialidade = e.id_especialidade
+        especialidades e ON eu.id_especialidade = e.id_especialidade
     WHERE 
         m.id_mao_de_obra = p_id_mao_de_obra;
 END;

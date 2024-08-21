@@ -14,26 +14,41 @@
     <form method="get" class="mb-3">
         <input type="text" name="search" class="form-control" placeholder="Pesquisar..." value="{{ search_query }}">
         <input type="hidden" name="sort_by" value="{{ sort_by }}">
-        <input type="hidden" name="sort_order" value="{{ sort_order }}">
+        <input type="hidden" name="sort_order" value="asc">
     </form>
 
     <table class="table faturas-table faturas-table-bordered mt-3" id="faturasTable">
         <thead>
             <tr>
                 <th>
-                    <a href="?sort_by=id_faturas&sort_order={% if sort_by == 'id_faturas' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Número da Fatura <i class="fas fa-sort {% if sort_by == 'id_faturas' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                    <a href="?sort_by=id_faturas" class="sort-link">
+                        Número da Fatura 
+                        <i class="fas fa-sort fa-sort-up"></i>
+                    </a>
                 </th>
                 <th>
-                    <a href="?sort_by=data_emissao&sort_order={% if sort_by == 'data_emissao' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Data de Emissão <i class="fas fa-sort {% if sort_by == 'data_emissao' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                    <a href="?sort_by=data_emissao" class="sort-link">
+                        Data de Emissão 
+                        <i class="fas fa-sort fa-sort-up"></i>
+                    </a>
                 </th>
                 <th>
-                    <a href="?sort_by=valor_total&sort_order={% if sort_by == 'valor_total' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Valor Total <i class="fas fa-sort {% if sort_by == 'valor_total' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                    <a href="?sort_by=valor_total" class="sort-link">
+                        Valor Total 
+                        <i class="fas fa-sort fa-sort-up"></i>
+                    </a>
                 </th>
                 <th>
-                    <a href="?sort_by=nome_cliente&sort_order={% if sort_by == 'nome_cliente' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">Nome do Cliente <i class="fas fa-sort {% if sort_by == 'nome_cliente' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                    <a href="?sort_by=nome_cliente" class="sort-link">
+                        Nome do Cliente 
+                        <i class="fas fa-sort fa-sort-up"></i>
+                    </a>
                 </th>
                 <th>
-                    <a href="?sort_by=nif_cliente&sort_order={% if sort_by == 'nif_cliente' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">NIF do Cliente <i class="fas fa-sort {% if sort_by == 'nif_cliente' %}{% if sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}{% endif %}"></i></a>
+                    <a href="?sort_by=nif_cliente" class="sort-link">
+                        NIF do Cliente 
+                        <i class="fas fa-sort fa-sort-up"></i>
+                    </a>
                 </th>
                 <th>Ações</th>
             </tr>
@@ -65,12 +80,12 @@
         <ul class="pagination justify-content-end">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                <a class="page-link" href="?page=1{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
                     <span aria-hidden="true">&laquo;&laquo;</span>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -80,12 +95,12 @@
 
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if sort_order %}&sort_order={{ sort_order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>
