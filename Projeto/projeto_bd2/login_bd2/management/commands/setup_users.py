@@ -85,7 +85,7 @@ class Command(BaseCommand):
 
     def _create_groups(self):
         self.stdout.write('A criar os grupos...')
-        groups = ['Trabalhador', 'Cliente']
+        groups = ['Administrador', 'Trabalhador', 'Cliente']
         for group_name in groups:
             if not Group.objects.filter(name=group_name).exists():
                 Group.objects.create(name=group_name)
