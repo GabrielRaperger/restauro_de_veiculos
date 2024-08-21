@@ -18,6 +18,9 @@ class Command(BaseCommand):
         # Criar a chave estrangeira entre auth_user e usuarios
         self._create_foreign_key()
 
+        # Criar Grupos
+        self._create_groups()
+
         # Criar Superuser
         self.stdout.write('A criar um superuser...')
         if not User.objects.filter(username='admin').exists():
@@ -29,6 +32,10 @@ class Command(BaseCommand):
                 last_name='User'
             )
 
+            # Associar o superuser ao grupo Administrador
+            admin_group = Group.objects.get(name='Administrador')
+            admin_user.groups.add(admin_group)
+
             next_id_usuarios = 21
             self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address', next_id_usuarios)
             next_id_usuarios += 1  
@@ -36,11 +43,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.WARNING('Superuser já existe'))
 
-        # Criar Grupos
-        self._create_groups()
-
-        # Associar usuários existentes ao auth_user e grupos
-        self.stdout.write('Associando usuários existentes ao auth_user e grupos...')
+        self.stdout.write('A associar usuários existentes ao auth_user e grupos...')
         self._associate_users_with_auth_user()
         self.stdout.write(self.style.SUCCESS('Script executado com sucesso'))
 
@@ -114,7 +117,6 @@ class Command(BaseCommand):
                     group = Group.objects.get(name=group_name)
                     user.groups.add(group)
 
-                    # Atualizar a tabela usuarios com o user_id do auth_user
                     cursor.execute("UPDATE usuarios SET user_id = %s WHERE id_usuarios = %s", [user.id, id_usuarios])
                     self.stdout.write(self.style.SUCCESS(f'Usuário "{nome}" associado ao grupo "{group_name}" e auth_user'))
                 else:
