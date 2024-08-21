@@ -174,12 +174,13 @@ def adicionar_encarregado(request):
 def ver_encarregado(request, id):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT u.nome, u.nif, u.email, u.telemovel, u.endereco
+            SELECT u.nome, u.nif, u.email, u.telemovel, u.endereco, e.id_especialidade
             FROM usuarios u
+            LEFT JOIN especialidade_usuarios e ON u.id_usuarios = e.id_usuarios
             WHERE u.id_usuarios = %s
         """, [id])
         resultado = cursor.fetchone()
-
+    
     if resultado:
         encarregado = {
             'id': id,
@@ -188,12 +189,14 @@ def ver_encarregado(request, id):
             'email': resultado[2],
             'telemovel': resultado[3],
             'endereco': resultado[4],
+            'especialidade_id': resultado[5],
         }
     else:
-        return redirect('listar_encarregados')
+        return redirect('app_bd2:encarregados')  
 
     if request.method == 'POST':
         if 'update' in request.POST:
+            especialidade_id = request.POST.get('especialidade')
             with connection.cursor() as cursor:
                 cursor.execute("""
                     UPDATE usuarios
@@ -207,13 +210,29 @@ def ver_encarregado(request, id):
                     request.POST['endereco'],
                     id
                 ])
-            return redirect('listar_encarregados')
+                
+                cursor.execute("""
+                    INSERT INTO especialidade_usuarios (id_especialidade, id_usuarios)
+                    VALUES (%s, %s)
+                    ON CONFLICT (id_usuarios) 
+                    DO UPDATE SET id_especialidade = EXCLUDED.id_especialidade
+                """, [especialidade_id, id])
+            
+            return redirect('app_bd2:encarregados')
         elif 'delete' in request.POST:
             with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM especialidade_usuarios WHERE id_usuarios = %s", [id])
                 cursor.execute("DELETE FROM usuarios WHERE id_usuarios = %s", [id])
-            return redirect('listar_encarregados')
+            return redirect('app_bd2:encarregados')
 
-    return render(request, 'encarregados/ver_encarregado.html', {'encarregado': encarregado, 'page_title': 'Ver Encarregado'})
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id_especialidade, nome FROM especialidades")
+        especialidades = cursor.fetchall()
+
+    return render(request, 'encarregados/ver_encarregado.html', {
+        'encarregado': encarregado,
+        'especialidades': especialidades
+    })
 
 # ------------------------ FATURAS -------------------------- #
 
