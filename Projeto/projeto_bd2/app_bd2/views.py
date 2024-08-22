@@ -740,12 +740,13 @@ def reparacoes(request):
     return render(request, 'reparacoes/lista_reparacoes.html')
 
 @login_required
-def listar_encarregado_reparacoes(request, id_encarregado=None):
-    # Se id_encarregado não for fornecido, usa o encarregado logado
+def listar_encarregado_reparacoes(request, id_encarregado):
+    print("Encarregado listado %s: ", id_encarregado)
+
     if not id_encarregado:
         id_encarregado = request.user.id
+        print("Encarregado logado %s: ", id_encarregado)
 
-    # Conectar ao MongoDB
     mongo_client = MongoClient("mongodb://localhost:27017/")
     mongo_db = mongo_client["BD2"]
     veiculos_collection = mongo_db["veiculos"]
@@ -768,26 +769,24 @@ def listar_encarregado_reparacoes(request, id_encarregado=None):
 
         reparacoes = cursor.fetchall()
 
-    # Lista final de reparações com matrículas
     reparacoes_com_matriculas = []
+
     for reparacao in reparacoes:
         id_restauro = reparacao[0]
         data_entrada = reparacao[1]
         mao_de_obra_nome = reparacao[2]
         id_veiculo = reparacao[3]
 
-        # Obter a matrícula do MongoDB usando id_veiculo
         veiculo = veiculos_collection.find_one({"pg_veiculo": id_veiculo})
         matricula = veiculo["matricula"] if veiculo else "Matrícula não encontrada"
 
         reparacoes_com_matriculas.append({
             'id_restauro': id_restauro,
-            'data_entrada': data_entrada,
+            'data_entrada': data_entrada.strftime("%d/%m/%Y %H:%M"),
             'mao_de_obra_nome': mao_de_obra_nome,
             'matricula': matricula
         })
 
-    # Fechar conexão MongoDB
     mongo_client.close()
 
     return render(request, 'template_trabalhador/listar_reparacoes.html', {
@@ -797,6 +796,3 @@ def listar_encarregado_reparacoes(request, id_encarregado=None):
 #--------------------- CLIENTE E ENCARREGADOS  --------------------------#
 def cliente_listar_faturas(request):
     return render(request, 'template_cliente/listar_faturas.html')
-
-# def encarregado_reparacoes(request):
-#     return render(request, 'template_trabalhador/listar_reparacoes.html')
