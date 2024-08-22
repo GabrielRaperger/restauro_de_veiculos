@@ -1,0 +1,122 @@
+{% extends "menu.html" %}
+
+{% block title %}Clientes - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="clientes-table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Lista de Reparações</h2>
+        <a href="{% url 'app_bd2:adicionar_cliente' %}" class="btn btn-success ml-auto">
+            <i class="fas fa-plus"></i> Criar Reparação
+        </a>
+    </div>
+
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por nome">
+
+    <table class="table clientes-table clientes-table-bordered mt-3" id="clientesTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Número da Reparação  <i class="fas fa-sort" id="sortIcon0"></i></th>
+                <th onclick="sortTable(1)">Data de Entrada <i class="fas fa-sort" id="sortIcon1"></i></th>
+                <th onclick="sortTable(2)">Tarefas <i class="fas fa-sort" id="sortIcon2"></i></th>
+                <th onclick="sortTable(3)">Matricula <i class="fas fa-sort" id="sortIcon3"></i></th>
+
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nome }}</td>
+                <td>{{ cliente.nif }}</td>
+                <td>{{ cliente.email }}</td>
+                <td>{{ cliente.telemovel }}</td>
+                <td>
+                    {% if cliente.id_usuarios %}
+                        <a href="{% url 'app_bd2:ver_cliente' cliente.id_usuarios %}" class="btn btn-primary btn-icon btn-view">
+                            <i class="fas fa-eye"></i> Ver Dados
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Nenhum cliente encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% block extra_scripts %}
+<script>
+    // Função para ordenar a tabela
+    function sortTable(n) {
+        var table = document.getElementById("clientesTable");
+        var rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
+        var switchIcon = document.getElementById(`sortIcon${n}`);
+        var dir = switchIcon.getAttribute("data-dir") === "asc" ? "desc" : "asc";
+        var switching = true;
+        
+        // Remover a classe de direção anterior
+        document.querySelectorAll('th i').forEach(icon => icon.classList.remove('fa-sort-up', 'fa-sort-down'));
+
+        // Definir o ícone de ordenação atual
+        switchIcon.classList.add(dir === "asc" ? 'fa-sort-up' : 'fa-sort-down');
+        switchIcon.setAttribute("data-dir", dir);
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                
+                if (dir === "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchCount++;
+            }
+        }
+    }
+
+    // Função para filtrar a tabela
+    document.getElementById("searchInput").addEventListener("input", function() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("clientesTable");
+        tr = table.getElementsByTagName("tr");
+        
+        for (i = 1; i < tr.length; i++) {
+            tr[i].style.display = "none";
+            td = tr[i].getElementsByTagName("td");
+            
+            for (var j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                        break;
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

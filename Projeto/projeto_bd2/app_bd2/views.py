@@ -728,3 +728,10 @@ def eliminar_veiculo(request, id_veiculo):
 
 def reparacoes(request):
     return render(request, 'reparacoes/lista_reparacoes.html')
+
+#--------------------- CLIENTE E ENCARREGADOS  --------------------------#
+def cliente_listar_faturas(request):
+    return render(request, 'template_cliente/listar_faturas.html')
+
+def encarregado_reparacoes(request):
+    return render(request, 'template_trabalhador/listar_reparacoes.html')
