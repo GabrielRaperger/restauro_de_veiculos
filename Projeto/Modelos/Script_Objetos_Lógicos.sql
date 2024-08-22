@@ -400,3 +400,47 @@ BEGIN
 END;
 $$;
 
+
+---------------------REGISTAR VEICULOS------ 
+----LISTAR IDS E VEICULOS-----
+CREATE OR REPLACE FUNCTION listar_ids_veiculos()
+RETURNS TABLE (
+    id_veiculo INTEGER
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id_veiculo
+    FROM veiculo;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION listar_ids_clientes()
+RETURNS TABLE (
+    id_cliente INTEGER
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id_usuarios
+    FROM usuarios;
+END;
+$$ LANGUAGE plpgsql;
+
+--inserir id_marca e id:cliente na tabela veiculo
+--a função retorna o id do veiculo inserido
+
+CREATE OR REPLACE FUNCTION inserir_veiculo(
+    p_id_marca INTEGER,
+    p_id_usuarios INTEGER
+) RETURNS INTEGER AS $$
+DECLARE
+    v_id_veiculo INTEGER;
+BEGIN
+    -- Inserir o veículo na tabela veiculo
+    INSERT INTO veiculo (id_marca, id_usuarios)
+    VALUES (p_id_marca, p_id_usuarios)
+    RETURNING id_veiculo INTO v_id_veiculo;
+
+    -- Retornar o ID do veículo inserido
+    RETURN v_id_veiculo;
+END;
+$$ LANGUAGE plpgsql;

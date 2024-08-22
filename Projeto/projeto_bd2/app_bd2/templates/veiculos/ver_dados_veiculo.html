@@ -1,54 +1,72 @@
 {% extends "menu.html" %}
 
-{% block title %}Ver Dados do Veículo{% endblock %}
+{% block title %}Detalhes do Veículo{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Ver Dados do Veículo</h2>
-    
-    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por marca, modelo, matrícula, cor..." value="{{ query }}">
-
-    <table class="table table-bordered mt-3" id="veiculosTable">
-        <thead>
-            <tr>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Submodelo</th>
-                <th>Matrícula</th>
-                <th>Cor</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for veiculo in veiculos %}
-            <tr>
-                <td>{{ veiculo.marca }}</td>
-                <td>{{ veiculo.modelo }}</td>
-                <td>{{ veiculo.submodelo }}</td>
-                <td>{{ veiculo.matricula }}</td>
-                <td>{{ veiculo.cor }}</td>
-                <td>
-                    <a href="{% url 'editar_veiculo' veiculo.id %}" class="btn btn-primary btn-icon btn-edit">
-                        <i class="fas fa-edit"></i> Editar
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">Nenhum veículo encontrado.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="veiculo-detalhes-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Detalhes do Veículo</h2>
+        <a href="{% url 'app_bd2:listar_veiculos' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            Detalhes do Veículo
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="id_veiculo">ID do Veículo</label>
+                <input type="text" class="form-control" id="id_veiculo" value="{{ veiculo.id_veiculo }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="marca">Marca</label>
+                <input type="text" class="form-control" id="marca" value="{{ marca }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="matricula">Matrícula</label>
+                <input type="text" class="form-control" id="matricula" value="{{ matricula }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="cor">Cor</label>
+                <input type="text" class="form-control" id="cor" value="{{ cor }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="potencia">Potência</label>
+                <input type="text" class="form-control" id="potencia" value="{{ potencia }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="tracao">Tração</label>
+                <input type="text" class="form-control" id="tracao" value="{{ tracao }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="combustivel">Combustível</label>
+                <input type="text" class="form-control" id="combustivel" value="{{ combustivel }}" readonly>
+            </div>
+        </div>
+    </div>
 </div>
 
-{% block extra_scripts %}
-<script>
-    document.getElementById("searchInput").addEventListener("input", function() {
-        var query = this.value;
-        window.location.href = "{% url 'ver_dados_veiculo' %}?q=" + encodeURIComponent(query);
-    });
-</script>
-{% endblock %}
+<style>
+    .veiculo-detalhes-container {
+        padding: 20px;
+    }
 
+    .card {
+        margin-top: 20px;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+</style>
 {% endblock %}

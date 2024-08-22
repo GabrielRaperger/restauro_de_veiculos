@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render
 from django.shortcuts import render, get_object_or_404
 from django.db import connection
+from pymongo import MongoClient
 from .forms.cliente import ClienteForm
 from .forms.encarregados import EncarregadoForm
-from .models import MaoDeObra
+from .models import MaoDeObra, Marca, Veiculo
 from datetime import datetime
 import json
 from django.core.paginator import Paginator
@@ -520,3 +521,218 @@ def veiculos(request):
     return render(request, 'veiculos/lista_veiculos.html')
 
 ####################################################################novo
+####################################################################novo
+#PARA DEVOLVER IDS DE CLIENTES E VEICULOS
+
+def mostrar_veiculos_clientes():
+    with connection.cursor() as cursor:
+        # Procura o ID e o nome da marca dos veículos
+        cursor.execute("""
+            SELECT DISTINCT ON (nome) id_marca, nome 
+            FROM marca
+            ORDER BY nome ASC           
+        """)
+        veiculos = [{"id": row[0], "nome": row[1]} for row in cursor.fetchall()]
+
+        # Procura o ID, nome e NIF dos clientes
+        cursor.execute("""
+            SELECT DISTINCT ON (nome, nif) id_usuarios, nome, nif
+            FROM usuarios
+            ORDER BY nome ASC           
+        """)
+        clientes = [{"id": row[0], "nome": row[1], "nif": row[2]} for row in cursor.fetchall()]
+
+    return veiculos, clientes
+
+client = MongoClient('localhost', 27017)
+db = client['BD2']  # Nome do banco de dados MongoDB
+
+def registar_veiculo(request):
+    if request.method == 'POST':
+        veiculo_id = request.POST.get('veiculo_id')
+        cliente_id = request.POST.get('cliente_id')
+        #matricula
+        matricula = request.POST.get('matricula')
+         #matricula
+        cor = request.POST.get('cor')
+        potencia = request.POST.get('potencia')
+        tracao = request.POST.get('tracao')
+        combustivel = request.POST.get('combustivel')
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO veiculo (id_marca, id_usuarios)
+                VALUES (%s, %s) RETURNING id_veiculo
+            """, [veiculo_id, cliente_id])
+            pg_veiculo_id = cursor.fetchone()[0]
+     
+
+        # Salvar no MongoDB
+        collection = db['veiculos']  # Nome da coleção (equivalente à tabela no SQL)
+        novo_veiculo = {
+            'pg_veiculo': pg_veiculo_id,  # Usa o ID gerado pelo PostgreSQL
+           # 'cliente_id': cliente_id,
+           'matricula': matricula,  # Inclui a matrícula
+            'cor': cor,
+            'potencia': potencia,
+            'tracao': tracao,
+            'combustivel': combustivel
+        }
+        collection.insert_one(novo_veiculo)
+
+        #return redirect('veiculos')
+
+    # Lógica para obter marcas e clientes e renderizar a página
+    veiculos, clientes = mostrar_veiculos_clientes()
+    context = {
+        'veiculos': veiculos,
+        'clientes': clientes,
+    }
+    return render(request, 'veiculos/registar_veiculo.html', context)
+
+
+#############LISTAR VEICULOS############
+
+def ver_veiculo(request, id_veiculo):
+    veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
+    return render(request, 'veiculos/ver_veiculo.html', {'veiculo': veiculo})
+
+def listar_veiculos(request):
+    veiculos = []
+
+    # Buscar dados do PostgreSQL
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT veiculo.id_veiculo, marca.nome AS marca, usuarios.nome AS cliente_nome, usuarios.nif AS cliente_nif
+            FROM veiculo
+            JOIN marca ON veiculo.id_marca = marca.id_marca
+            JOIN usuarios ON veiculo.id_usuarios = usuarios.id_usuarios
+        """)
+        resultados = cursor.fetchall()
+
+    # Buscar dados do MongoDB
+    collection = db['veiculos']
+    mongo_veiculos = collection.find()
+
+    # Criar um dicionário para buscar matrículas pelo ID do veículo
+    matriculas = {v.get('pg_veiculo'): v.get('matricula', 'Não disponível') for v in mongo_veiculos}
+
+    # Adicionar a matrícula dos veículos aos dados coletados do PostgreSQL
+    for row in resultados:
+        id_veiculo = row[0]
+        veiculos.append({
+            'id_veiculo': id_veiculo,
+            'marca': row[1],
+            'cliente_nome': row[2],
+            'cliente_nif': row[3],
+            'matricula': matriculas.get(id_veiculo, 'Não disponível')  # Ajuste o acesso à matrícula
+        })
+
+    return render(request, 'veiculos/lista_veiculos.html', {'veiculos': veiculos, 'page_title': 'Lista de Veículos'})
+
+##############VER DADOS VEICULO
+
+def ver_veiculo(request, id_veiculo):
+    # Recuperar o veículo do PostgreSQL
+    veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
+    
+    # Recuperar dados do MongoDB
+    collection = db['veiculos']
+    mongo_veiculo = collection.find_one({'pg_veiculo': id_veiculo})
+    
+    # Preparar dados para exibição
+    context = {
+        'veiculo': veiculo,
+        'marca': veiculo.id_marca.nome if hasattr(veiculo.id_marca, 'nome') else 'Marca não definida',
+        'matricula': mongo_veiculo.get('matricula', 'Não disponível') if mongo_veiculo else 'Não disponível',
+        'cor': mongo_veiculo.get('cor', 'Não disponível') if mongo_veiculo else 'Não disponível',
+        'potencia': mongo_veiculo.get('potencia', 'Não disponível') if mongo_veiculo else 'Não disponível',
+        'tracao': mongo_veiculo.get('tracao', 'Não disponível') if mongo_veiculo else 'Não disponível',
+        'combustivel': mongo_veiculo.get('combustivel', 'Não disponível') if mongo_veiculo else 'Não disponível',
+    }
+    
+    return render(request, 'veiculos/ver_dados_veiculo.html', context)
+
+
+############  EDITAR VEICULO
+
+def editar_veiculo(request, id_veiculo):
+    veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
+    
+    # Dados fixos para seleção
+    cores = ['Preto', 'Branco', 'Cinzento', 'Azul', 'Vermelho', 'Verde', 'Amarelo']
+    potencias = ['50 Cv', '100 Cv', '150 Cv', '300 Cv', '500 Cv']
+    tracoes = ['FWD', 'RWD', '4WD']
+    combustiveis = ['Gasolina', 'Diesel', 'Elétrico', 'Híbrido', 'GPL']
+    marcas = Marca.objects.all().distinct()  # Usa distinct para garantir marcas únicas
+
+    # Buscar dados do veículo no MongoDB
+    collection = db['veiculos']
+    veiculo_data_mongo = collection.find_one({'pg_veiculo': id_veiculo})
+    
+    if not veiculo_data_mongo:
+        return redirect('app_bd2:ver_veiculo', id_veiculo=id_veiculo)
+
+    if request.method == 'POST':
+        matricula = request.POST.get('matricula')
+        cor = request.POST.get('cor')
+        potencia = request.POST.get('potencia')
+        tracao = request.POST.get('tracao')
+        combustivel = request.POST.get('combustivel')
+        marca_id = request.POST.get('marca')
+        
+        # Atualiza os dados no MongoDB
+        collection.update_one(
+            {'pg_veiculo': id_veiculo},
+            {'$set': {
+                'matricula': matricula,
+                'cor': cor,
+                'potencia': potencia,
+                'tracao': tracao,
+                'combustivel': combustivel
+            }}
+        )
+        
+        # Atualiza a marca no PostgreSQL
+        veiculo.id_marca_id = marca_id
+        veiculo.save()
+        
+        return redirect('app_bd2:ver_veiculo', id_veiculo=id_veiculo)
+
+    veiculo_data = {
+        'matricula': veiculo_data_mongo.get('matricula', ''),
+        'cor': veiculo_data_mongo.get('cor', ''),
+        'potencia': veiculo_data_mongo.get('potencia', ''),
+        'tracao': veiculo_data_mongo.get('tracao', ''),
+        'combustivel': veiculo_data_mongo.get('combustivel', ''),
+        'marca_id': veiculo.id_marca_id,
+    }
+
+    context = {
+        'veiculo': veiculo,
+        'marcas': marcas,
+        'cores': cores,
+        'potencias': potencias,
+        'tracoes': tracoes,
+        'combustiveis': combustiveis,
+        'veiculo_data': veiculo_data
+    }
+    return render(request, 'veiculos/editar_veiculo.html', context)
+
+
+
+###################   ELIMINAR
+def eliminar_veiculo(request, id_veiculo):
+    if request.method == 'POST':
+        # Excluindo o veículo do PostgreSQL
+        veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
+        veiculo.delete()
+
+        # Excluindo o veículo do MongoDB
+        collection = db['veiculos']
+        collection.delete_one({'pg_veiculo': id_veiculo})
+
+        return redirect('app_bd2:listar_veiculos')  # Redireciona para a lista de veículos
+
+    # Se o método não for POST, redireciona para a página do veículo
+    return redirect('app_bd2:ver_veiculo', id_veiculo=id_veiculo)

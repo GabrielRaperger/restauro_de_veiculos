@@ -1,41 +1,77 @@
 {% extends "menu.html" %}
 
-{% block title %}Editar Veículo - {{ veiculo.marca }} {{ veiculo.modelo }}{% endblock %}
+{% block title %}Editar Veículo{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Editar Veículo: {{ veiculo.marca }} {{ veiculo.modelo }}</h2>
+    <h2>Editar Veículo</h2>
     
     <form method="POST">
         {% csrf_token %}
         
+        <!-- Campo ID do Veículo (somente visualização) -->
+        <div class="form-group">
+            <label for="veiculo_id">ID do Veículo</label>
+            <input type="text" class="form-control" id="veiculo_id" value="{{ veiculo.id_veiculo }}" readonly>
+        </div>
+        
         <div class="form-group">
             <label for="marca">Marca</label>
-            <input type="text" class="form-control" id="marca" name="marca" value="{{ form.marca.value }}">
-        </div>
-        
-        <div class="form-group">
-            <label for="modelo">Modelo</label>
-            <input type="text" class="form-control" id="modelo" name="modelo" value="{{ form.modelo.value }}">
-        </div>
-        
-        <div class="form-group">
-            <label for="submodelo">Submodelo</label>
-            <input type="text" class="form-control" id="submodelo" name="submodelo" value="{{ form.submodelo.value }}">
+            <select class="form-control" id="marca" name="marca" required>
+                <option value="">Selecione uma marca</option>
+                {% for marca in marcas %}
+                    <option value="{{ marca.id_marca }}" {% if marca.id_marca == veiculo_data.marca_id %}selected{% endif %}>{{ marca.nome }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <div class="form-group">
             <label for="matricula">Matrícula</label>
-            <input type="text" class="form-control" id="matricula" name="matricula" value="{{ form.matricula.value }}">
+            <input type="text" class="form-control" id="matricula" name="matricula" value="{{ veiculo_data.matricula }}" placeholder="Digite a matrícula" required>
         </div>
 
         <div class="form-group">
             <label for="cor">Cor</label>
-            <input type="text" class="form-control" id="cor" name="cor" value="{{ form.cor.value }}">
+            <select class="form-control" id="cor" name="cor" required>
+                <option value="">Selecione a cor do veículo</option>
+                {% for cor in cores %}
+                    <option value="{{ cor }}" {% if cor == veiculo_data.cor %}selected{% endif %}>{{ cor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="potencia">Potência</label>
+            <select class="form-control" id="potencia" name="potencia" required>
+                <option value="">Selecione a potência</option>
+                {% for potencia in potencias %}
+                    <option value="{{ potencia }}" {% if potencia == veiculo_data.potencia %}selected{% endif %}>{{ potencia }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="tracao">Tração</label>
+            <select class="form-control" id="tracao" name="tracao" required>
+                <option value="">Selecione a tração</option>
+                {% for tracao in tracoes %}
+                    <option value="{{ tracao }}" {% if tracao == veiculo_data.tracao %}selected{% endif %}>{{ tracao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="combustivel">Combustível</label>
+            <select class="form-control" id="combustivel" name="combustivel" required>
+                <option value="">Selecione o tipo de combustível</option>
+                {% for combustivel in combustiveis %}
+                    <option value="{{ combustivel }}" {% if combustivel == veiculo_data.combustivel %}selected{% endif %}>{{ combustivel }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        <a href="{% url 'lista_veiculos' %}" class="btn btn-secondary">Cancelar</a>
+        <a href="{% url 'app_bd2:ver_veiculo' veiculo.id_veiculo %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}
