@@ -375,6 +375,65 @@ def lista_saida(request):
 
     return render(request, 'faturas/lista_saida.html', context)
 
+def cliente_listar_faturas(request):
+    id_logado = request.user.id
+
+    mongo_client = MongoClient("mongodb://localhost:27017/")
+    mongo_db = mongo_client["BD2"]
+    veiculos_collection = mongo_db["veiculos"]
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_usuarios
+            FROM usuarios
+            WHERE user_id = %s
+        """, [id_logado])
+        id_usuarios = cursor.fetchone()
+
+        if id_usuarios:
+            id_usuarios = id_usuarios[0]
+        else:
+            id_usuarios = None
+
+        if id_usuarios:
+            cursor.execute("""
+                SELECT faturas.id_faturas, faturas.data_emissao, faturas.valor_total, veiculo.id_veiculo
+                FROM faturas 
+                    INNER JOIN saida ON faturas.id_saida = saida.id_saida
+                    INNER JOIN restauro ON saida.id_restauro = restauro.id_restauro
+                    INNER JOIN entrada ON restauro.id_entrada = entrada.id_entrada
+                    INNER JOIN veiculo ON entrada.id_veiculo = veiculo.id_veiculo
+                WHERE faturas.id_usuarios = %s
+                ORDER BY faturas.data_emissao DESC
+            """, [id_usuarios])
+
+            faturas = cursor.fetchall()
+
+            faturas_com_matriculas = []
+            for fatura in faturas:
+                id_faturas = fatura[0]
+                data_emissao = fatura[1]
+                valor_total = fatura[2]
+                id_veiculo = fatura[3]
+
+                veiculo = veiculos_collection.find_one({"pg_veiculo": id_veiculo})
+                matricula = veiculo["matricula"] if veiculo else "Matrícula não encontrada"
+
+                faturas_com_matriculas.append({
+                    'id_faturas': id_faturas,
+                    'data_emissao': data_emissao,
+                    'valor_total': valor_total,
+                    'matricula': matricula
+                })
+        else:
+            faturas_com_matriculas = []
+
+    mongo_client.close()
+
+    return render(request, 'template_cliente/listar_faturas.html', {
+        'faturas': faturas_com_matriculas
+    })
+
 #--------------------- MÃO DE OBRA --------------------------#
 
 def adicionar_mao_de_obra(request):
@@ -850,7 +909,3 @@ def listar_encarregado_logado_reparacoes(request):
     return render(request, 'template_trabalhador/listar_reparacoes.html', {
         'reparacoes': reparacoes_com_matriculas
     })
-
-#--------------------- CLIENTE E ENCARREGADOS  --------------------------#
-def cliente_listar_faturas(request):
-    return render(request, 'template_cliente/listar_faturas.html')

@@ -12,6 +12,7 @@ urlpatterns = [
     path('clientes/adicionar_cliente/', adicionar_cliente, name='adicionar_cliente'),
     path('clientes/<int:id>/ver_cliente/', views.ver_cliente, name='ver_cliente'),
     path('clientes/faturas', views.cliente_listar_faturas, name='cliente_listar_faturas'),
+
     # ---------- ENCARREGADOS ----------------- #
     path('encarregados/', encarregados, name='encarregados'),
     path('encarregados/adicionar_encarregado/', adicionar_encarregado, name='adicionar_encarregado'),
@@ -41,6 +42,4 @@ urlpatterns = [
     path('veiculos/ver/<int:id_veiculo>/', views.ver_veiculo, name='ver_veiculo'),
     path('veiculos/editar/<int:id_veiculo>/', views.editar_veiculo, name='editar_veiculo'),
     path('veiculo/eliminar/<int:id_veiculo>/', views.eliminar_veiculo, name='eliminar_veiculo'),
-   
-  
 ]
