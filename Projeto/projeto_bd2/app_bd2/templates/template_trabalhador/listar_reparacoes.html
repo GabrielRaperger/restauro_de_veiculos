@@ -7,7 +7,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Lista de Reparações</h2>
         <a href="{% url 'app_bd2:adicionar_cliente' %}" class="btn btn-success ml-auto">
+            {% if request.user.groups.all.0.name == "Trabalhador" %}
             <i class="fas fa-plus"></i> Criar Reparação
+            {% endif %}
         </a>
     </div>
 

@@ -741,12 +741,6 @@ def reparacoes(request):
 
 @login_required
 def listar_encarregado_reparacoes(request, id_encarregado):
-    print("Encarregado listado %s: ", id_encarregado)
-
-    if not id_encarregado:
-        id_encarregado = request.user.id
-        print("Encarregado logado %s: ", id_encarregado)
-
     mongo_client = MongoClient("mongodb://localhost:27017/")
     mongo_db = mongo_client["BD2"]
     veiculos_collection = mongo_db["veiculos"]
@@ -786,6 +780,70 @@ def listar_encarregado_reparacoes(request, id_encarregado):
             'mao_de_obra_nome': mao_de_obra_nome,
             'matricula': matricula
         })
+
+    mongo_client.close()
+
+    return render(request, 'template_trabalhador/listar_reparacoes.html', {
+        'reparacoes': reparacoes_com_matriculas
+    })
+
+@login_required
+def listar_encarregado_logado_reparacoes(request):
+    id_logado = request.user.id
+
+    mongo_client = MongoClient("mongodb://localhost:27017/")
+    mongo_db = mongo_client["BD2"]
+    veiculos_collection = mongo_db["veiculos"]
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_usuarios
+            FROM usuarios
+            WHERE user_id = %s
+        """, [id_logado])
+        id_usuarios = cursor.fetchone()
+
+        if id_usuarios:
+            id_usuarios = id_usuarios[0]
+        else:
+            id_usuarios = None
+
+        if id_usuarios:
+            cursor.execute("""
+                SELECT
+                    r.id_restauro,
+                    e.data AS data_entrada,
+                    m.nome AS mao_de_obra_nome,
+                    v.id_veiculo
+                FROM restauro r
+                INNER JOIN entrada e ON r.id_entrada = e.id_entrada
+                INNER JOIN veiculo v ON e.id_veiculo = v.id_veiculo
+                INNER JOIN mao_restauro mr ON r.id_restauro = mr.id_restauro
+                INNER JOIN mao_de_obra m ON mr.id_mao_de_obra = m.id_mao_de_obra
+                WHERE m.id_usuarios = %s
+                ORDER BY e.data DESC
+            """, [id_usuarios])
+
+            reparacoes = cursor.fetchall()
+
+            reparacoes_com_matriculas = []
+            for reparacao in reparacoes:
+                id_restauro = reparacao[0]
+                data_entrada = reparacao[1]
+                mao_de_obra_nome = reparacao[2]
+                id_veiculo = reparacao[3]
+
+                veiculo = veiculos_collection.find_one({"pg_veiculo": id_veiculo})
+                matricula = veiculo["matricula"] if veiculo else "Matrícula não encontrada"
+
+                reparacoes_com_matriculas.append({
+                    'id_restauro': id_restauro,
+                    'data_entrada': data_entrada,
+                    'mao_de_obra_nome': mao_de_obra_nome,
+                    'matricula': matricula
+                })
+        else:
+            reparacoes_com_matriculas = []
 
     mongo_client.close()
 

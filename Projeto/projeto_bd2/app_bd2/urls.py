@@ -16,8 +16,8 @@ urlpatterns = [
     path('encarregados/', encarregados, name='encarregados'),
     path('encarregados/adicionar_encarregado/', adicionar_encarregado, name='adicionar_encarregado'),
     path('encarregados/<int:id>/ver_encarregado/', views.ver_encarregado, name='ver_encarregado'),
-    path('encarregados/lista_reparacoes/', views.listar_encarregado_reparacoes, name='listar_encarregado_reparacoes'),
-    path('encarregados/lista_reparacoes/<int:id_encarregado>/', views.listar_encarregado_reparacoes, name='listar_encarregado_reparacoes'),
+    path('encarregados/<int:id_encarregado>/lista_reparacoes/', views.listar_encarregado_reparacoes, name='listar_encarregado_reparacoes'),
+    path('encarregados/listar_encarregado_logado_reparacoes/', views.listar_encarregado_logado_reparacoes, name='listar_encarregado_logado_reparacoes'),
 
     # ---------- FATURAS ----------------- #
     path('faturas/', lista_faturas, name='lista_faturas'),
