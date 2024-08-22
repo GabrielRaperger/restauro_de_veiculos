@@ -1,90 +1,101 @@
 {% extends "menu.html" %}
 
-{% block title %}Registar Novo Veículo - Minha Aplicação{% endblock %}
+{% block title %}Registrar Novo Veículo - Minha Aplicação{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Registrar Veículo</h2>
-    
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="veiculo_id">Veículo</label>
-            <select class="form-control" id="veiculo_id" name="veiculo_id" required>
-                <option value="">Selecione um veículo</option>
-                {% for veiculo in veiculos %}
-                    <option value="{{ veiculo.id }}">{{ veiculo.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
+<div class="clientes-table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Adicionar Veiculo</h2>
+        <a href="{% url 'app_bd2:listar_veiculos' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
 
-        <div class="form-group">
-            <label for="cliente_id">Cliente</label>
-            <select class="form-control" id="cliente_id" name="cliente_id" required>
-                <option value="">Selecione um cliente</option>
-                {% for cliente in clientes %}
-                    <option value="{{ cliente.id }}">{{ cliente.nome }} : {{ cliente.nif }}</option>
-                {% endfor %}
-            </select>
+    <div class="card">
+        <div class="card-header">
+            Preencha os detalhes abaixo
         </div>
-<!--matricula-->
-        <div class="form-group">
-            <label for="matricula">Matrícula</label>
-            <input type="text" class="form-control" id="matricula" name="matricula" placeholder="Digite a matrícula" required>
-        </div>
-<!--matricula-->
+        <div class="card-body">
+            <form method="POST" action="{% url 'app_bd2:registar_veiculo' %}">
+                {% csrf_token %}
+                
+                <div class="form-group mt-3">
+                    <label for="veiculo_id">Marca</label>
+                    <select class="form-control" id="veiculo_id" name="veiculo_id" required>
+                        <option value="">Selecione a Marca do Veiculo</option>
+                        {% for veiculo in veiculos %}
+                            <option value="{{ veiculo.id }}">{{ veiculo.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label for="cor">Cor</label>
-            <select class="form-control" id="cor" name="cor" required>
-                <option value="">Selecione a cor do veículo</option>
-                <option value="Preto">Preto</option>
-                <option value="Branco">Branco</option>
-                <option value="Cinza">Cinzento</option>
-                <option value="Azul">Azul</option>
-                <option value="Vermelho">Vermelho</option>
-                <option value="Preto">Verde</option>
-                <option value="Preto">Amarelo</option>
-            </select>
-        </div>
+                <div class="form-group mt-3">
+                    <label for="cliente_id">Cliente</label>
+                    <select class="form-control" id="cliente_id" name="cliente_id" required>
+                        <option value="">Selecione um cliente</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">{{ cliente.nome }} : {{ cliente.nif }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label for="potencia">Potência</label>
-            <select class="form-control" id="potencia" name="potencia" required>
-                <option value="">Selecione a potência</option>
-                <option value="100">50 Cv </option>
-                <option value="150">100 Cv</option>
-                <option value="200">150 Cv</option>
-                <option value="250">300 Cv</option>
-                <option value="300">500Cv</option>
-            </select>
-        </div>
+                <div class="form-group mt-3">
+                    <label for="matricula">Matrícula</label>
+                    <input type="text" class="form-control" id="matricula" name="matricula" placeholder="Digite a matrícula" required>
+                </div>
 
-        <div class="form-group">
-            <label for="tracao">Tração</label>
-            <select class="form-control" id="tracao" name="tracao" required>
-                <option value="">Selecione a tração</option>
-                <option value="FWD">FWD (Tração dianteira)</option>
-                <option value="RWD">RWD (Tração traseira)</option>
-                <option value="4WD">4x4</option>
-            </select>
-        </div>
+                <div class="form-group mt-3">
+                    <label for="cor">Cor</label>
+                    <select class="form-control" id="cor" name="cor" required>
+                        <option value="">Selecione a cor do veículo</option>
+                        <option value="Preto">Preto</option>
+                        <option value="Branco">Branco</option>
+                        <option value="Cinza">Cinza</option>
+                        <option value="Azul">Azul</option>
+                        <option value="Vermelho">Vermelho</option>
+                        <option value="Verde">Verde</option>
+                        <option value="Amarelo">Amarelo</option>
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label for="combustivel">Combustível</label>
-            <select class="form-control" id="combustivel" name="combustivel" required>
-                <option value="">Selecione o tipo de combustível</option>
-                <option value="Gasolina">Gasolina</option>
-                <option value="Diesel">Diesel</option>
-                <option value="Elétrico">Elétrico</option>
-                <option value="Híbrido">Híbrido</option>
-                <option value="GPL">GPL</option>
-            </select>
-        </div>
+                <div class="form-group mt-3">
+                    <label for="potencia">Potência</label>
+                    <select class="form-control" id="potencia" name="potencia" required>
+                        <option value="">Selecione a potência</option>
+                        <option value="50">50 Cv</option>
+                        <option value="100">100 Cv</option>
+                        <option value="150">150 Cv</option>
+                        <option value="200">200 Cv</option>
+                        <option value="300">300 Cv</option>
+                    </select>
+                </div>
 
-        <button type="submit" class="btn btn-primary">Registar Veículo</button>
-        <a href="" class="btn btn-secondary">Cancelar</a>
-    </form>
+                <div class="form-group mt-3">
+                    <label for="tracao">Tração</label>
+                    <select class="form-control" id="tracao" name="tracao" required>
+                        <option value="">Selecione a tração</option>
+                        <option value="FWD">FWD (Tração dianteira)</option>
+                        <option value="RWD">RWD (Tração traseira)</option>
+                        <option value="4WD">4x4</option>
+                    </select>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="combustivel">Combustível</label>
+                    <select class="form-control" id="combustivel" name="combustivel" required>
+                        <option value="">Selecione o tipo de combustível</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Elétrico">Elétrico</option>
+                        <option value="Híbrido">Híbrido</option>
+                        <option value="GPL">GPL</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Registrar Veículo</button>
+                <a href="{% url 'app_bd2:listar_veiculos' %}" class="btn btn-secondary mt-4">Cancelar</a>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
