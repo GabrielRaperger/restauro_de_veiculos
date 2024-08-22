@@ -217,11 +217,21 @@ def ver_encarregado(request, id):
                 ])
                 
                 cursor.execute("""
-                    INSERT INTO especialidade_usuarios (id_especialidade, id_usuarios)
-                    VALUES (%s, %s)
-                    ON CONFLICT (id_usuarios) 
-                    DO UPDATE SET id_especialidade = EXCLUDED.id_especialidade
-                """, [especialidade_id, id])
+                    SELECT 1 FROM especialidade_usuarios WHERE id_usuarios = %s
+                """, [id])
+                exists = cursor.fetchone()
+                
+                if exists:
+                    cursor.execute("""
+                        UPDATE especialidade_usuarios
+                        SET id_especialidade = %s
+                        WHERE id_usuarios = %s
+                    """, [especialidade_id, id])
+                else:
+                    cursor.execute("""
+                        INSERT INTO especialidade_usuarios (id_especialidade, id_usuarios)
+                        VALUES (%s, %s)
+                    """, [especialidade_id, id])
             
             return redirect('app_bd2:encarregados')
         elif 'delete' in request.POST:
@@ -237,7 +247,6 @@ def ver_encarregado(request, id):
         'encarregado': encarregado,
         'especialidades': especialidades
     })
-
 
 # ------------------------ FATURAS -------------------------- #
 
