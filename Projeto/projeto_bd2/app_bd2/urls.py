@@ -11,11 +11,13 @@ urlpatterns = [
     path('clientes/', clientes, name='clientes'),
     path('clientes/adicionar_cliente/', adicionar_cliente, name='adicionar_cliente'),
     path('clientes/<int:id>/ver_cliente/', views.ver_cliente, name='ver_cliente'),
-
+    path('clientes/faturas', views.cliente_listar_faturas, name='cliente_listar_faturas'),
     # ---------- ENCARREGADOS ----------------- #
     path('encarregados/', encarregados, name='encarregados'),
     path('encarregados/adicionar_encarregado/', adicionar_encarregado, name='adicionar_encarregado'),
     path('encarregados/<int:id>/ver_encarregado/', views.ver_encarregado, name='ver_encarregado'),
+    path('encarregados/lista_reparacoes/', views.listar_encarregado_reparacoes, name='listar_encarregado_reparacoes'),
+    path('encarregados/lista_reparacoes/<int:id_encarregado>/', views.listar_encarregado_reparacoes, name='listar_encarregado_reparacoes'),
 
     # ---------- FATURAS ----------------- #
     path('faturas/', lista_faturas, name='lista_faturas'),
@@ -30,11 +32,7 @@ urlpatterns = [
     path('mao_de_obra/<int:id_mao_de_obra>/editar/', views.editar_mao_de_obra, name='editar_mao_de_obra'),
     path('mao_de_obra/<int:id_mao_de_obra>/deletar/', views.deletar_mao_de_obra, name='deletar_mao_de_obra'),
 
-    #------------------- CLIENTES E TRABALHADOR ----------------------#
-    path('clientes/faturas', views.cliente_listar_faturas, name='cliente_listar_faturas'),
-    path('encarregados/reparacoes', views.encarregado_reparacoes, name='encarregado_reparacoes'),
-
-
+    #------------------- REPARACOES ----------------------#
     path('reparacoes/', reparacoes, name='reparacoes'),
 
     #------------------- VEICULOS  ----------------------#

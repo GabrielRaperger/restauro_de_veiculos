@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.shortcuts import render, get_object_or_404
 from django.db import connection
+from django.contrib.auth.decorators import login_required
 from pymongo import MongoClient
 from .forms.cliente import ClienteForm
 from .forms.encarregados import EncarregadoForm
@@ -738,9 +739,64 @@ def eliminar_veiculo(request, id_veiculo):
 def reparacoes(request):
     return render(request, 'reparacoes/lista_reparacoes.html')
 
+@login_required
+def listar_encarregado_reparacoes(request, id_encarregado=None):
+    # Se id_encarregado não for fornecido, usa o encarregado logado
+    if not id_encarregado:
+        id_encarregado = request.user.id
+
+    # Conectar ao MongoDB
+    mongo_client = MongoClient("mongodb://localhost:27017/")
+    mongo_db = mongo_client["BD2"]
+    veiculos_collection = mongo_db["veiculos"]
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                r.id_restauro,
+                e.data AS data_entrada,
+                m.nome AS mao_de_obra_nome,
+                v.id_veiculo
+            FROM restauro r
+            INNER JOIN entrada e ON r.id_entrada = e.id_entrada
+            INNER JOIN veiculo v ON e.id_veiculo = v.id_veiculo
+            INNER JOIN mao_restauro mr ON r.id_restauro = mr.id_restauro
+            INNER JOIN mao_de_obra m ON mr.id_mao_de_obra = m.id_mao_de_obra
+            WHERE m.id_usuarios = %s
+            ORDER BY e.data DESC
+        """, [id_encarregado])
+
+        reparacoes = cursor.fetchall()
+
+    # Lista final de reparações com matrículas
+    reparacoes_com_matriculas = []
+    for reparacao in reparacoes:
+        id_restauro = reparacao[0]
+        data_entrada = reparacao[1]
+        mao_de_obra_nome = reparacao[2]
+        id_veiculo = reparacao[3]
+
+        # Obter a matrícula do MongoDB usando id_veiculo
+        veiculo = veiculos_collection.find_one({"pg_veiculo": id_veiculo})
+        matricula = veiculo["matricula"] if veiculo else "Matrícula não encontrada"
+
+        reparacoes_com_matriculas.append({
+            'id_restauro': id_restauro,
+            'data_entrada': data_entrada,
+            'mao_de_obra_nome': mao_de_obra_nome,
+            'matricula': matricula
+        })
+
+    # Fechar conexão MongoDB
+    mongo_client.close()
+
+    return render(request, 'template_trabalhador/listar_reparacoes.html', {
+        'reparacoes': reparacoes_com_matriculas
+    })
+
 #--------------------- CLIENTE E ENCARREGADOS  --------------------------#
 def cliente_listar_faturas(request):
     return render(request, 'template_cliente/listar_faturas.html')
 
-def encarregado_reparacoes(request):
-    return render(request, 'template_trabalhador/listar_reparacoes.html')
+# def encarregado_reparacoes(request):
+#     return render(request, 'template_trabalhador/listar_reparacoes.html')
