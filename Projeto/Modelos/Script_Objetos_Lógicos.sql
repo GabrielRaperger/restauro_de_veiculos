@@ -143,6 +143,7 @@ RETURNS TABLE (
     endereco_cliente VARCHAR,
     email_cliente VARCHAR,
     id_restauro INTEGER,
+    id_veiculo INTEGER,
     mao_de_obra JSONB
 ) AS $$
 BEGIN
@@ -178,6 +179,13 @@ BEGIN
         JOIN mao_de_obra m ON mr.id_mao_de_obra = m.id_mao_de_obra
         WHERE s.id_restauro IS NOT NULL
         GROUP BY s.id_restauro
+    ),
+    veiculo_info AS (
+        SELECT 
+            e.id_veiculo,
+            r.id_restauro
+        FROM entrada e
+        JOIN restauro r ON e.id_entrada = r.id_entrada
     )
     SELECT 
         f.id_fatura,
@@ -190,12 +198,15 @@ BEGIN
         f.endereco_cliente,
         f.email_cliente,
         f.id_restauro,
+        vi.id_veiculo,
         COALESCE(m.mao_de_obra, '[]') AS mao_de_obra
     FROM fatura_info f
     LEFT JOIN mao_info m ON f.id_restauro = m.id_restauro
+    LEFT JOIN veiculo_info vi ON f.id_restauro = vi.id_restauro
     WHERE f.id_fatura = fatura_id;
 END;
 $$ LANGUAGE plpgsql;
+
 
 
 CREATE OR REPLACE FUNCTION listar_faturas()
@@ -301,7 +312,6 @@ BEGIN
     RETURN v_id_faturas;
 END;
 $$ LANGUAGE plpgsql;
-
 
 -------------------------------- MAO DE OBRA ------------------------------------
 CREATE OR REPLACE FUNCTION listar_trabalhadores_com_especialidade()

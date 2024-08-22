@@ -1,0 +1,83 @@
+[
+    {
+      "pg_veiculo": 1,
+      "matricula": "25-89-56",
+      "cor": "Preto",
+      "potencia": "100 Cv",
+      "tracao": "FWD",
+      "combustivel": "Gasolina"
+    },
+    {
+      "pg_veiculo": 2,
+      "matricula": "42-76-84",
+      "cor": "Branco",
+      "potencia": "150 Cv",
+      "tracao": "RWD",
+      "combustivel": "Diesel"
+    },
+    {
+      "pg_veiculo": 3,
+      "matricula": "12-34-98",
+      "cor": "Cinzento",
+      "potencia": "300 Cv",
+      "tracao": "4WD",
+      "combustivel": "Elétrico"
+    },
+    {
+      "pg_veiculo": 4,
+      "matricula": "75-43-21",
+      "cor": "Azul",
+      "potencia": "50 Cv",
+      "tracao": "FWD",
+      "combustivel": "Híbrido"
+    },
+    {
+      "pg_veiculo": 5,
+      "matricula": "93-28-65",
+      "cor": "Vermelho",
+      "potencia": "500 Cv",
+      "tracao": "RWD",
+      "combustivel": "GPL"
+    },
+    {
+      "pg_veiculo": 6,
+      "matricula": "64-23-87",
+      "cor": "Verde",
+      "potencia": "150 Cv",
+      "tracao": "FWD",
+      "combustivel": "Gasolina"
+    },
+    {
+      "pg_veiculo": 7,
+      "matricula": "54-72-31",
+      "cor": "Amarelo",
+      "potencia": "300 Cv",
+      "tracao": "4WD",
+      "combustivel": "Diesel"
+    },
+    {
+      "pg_veiculo": 8,
+      "matricula": "87-65-43",
+      "cor": "Preto",
+      "potencia": "100 Cv",
+      "tracao": "RWD",
+      "combustivel": "Elétrico"
+    },
+    {
+      "pg_veiculo": 9,
+      "matricula": "28-47-92",
+      "cor": "Branco",
+      "potencia": "500 Cv",
+      "tracao": "FWD",
+      "combustivel": "Híbrido"
+    },
+    {
+      "pg_veiculo": 10,
+      "matricula": "19-38-57",
+      "cor": "Cinzento",
+      "potencia": "50 Cv",
+      "tracao": "4WD",
+      "combustivel": "GPL"
+    }
+  ]
+  

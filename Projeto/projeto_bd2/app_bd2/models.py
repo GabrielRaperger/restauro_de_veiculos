@@ -1,19 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Modelo(models.Model):
-    id_modelo = models.AutoField(primary_key=True)
-    nome = models.CharField(max_length=30)
-
-    class Meta:
-        db_table = 'modelo'
-
-    def __str__(self):
-        return self.nome
-
 class Marca(models.Model):
     id_marca = models.AutoField(primary_key=True)
-    id_modelo = models.ForeignKey(Modelo, on_delete=models.CASCADE, db_column='id_modelo')
     nome = models.CharField(max_length=30)
 
     class Meta:
@@ -96,13 +85,6 @@ class MaoDeObra(models.Model):
     class Meta:
         db_table = 'mao_de_obra'
 
-class ModeloSubmodelo(models.Model):
-    id_sub_modelo = models.AutoField(primary_key=True)
-    id_modelo = models.ForeignKey(Modelo, on_delete=models.CASCADE, db_column='id_modelo')
-
-    class Meta:
-        db_table = 'modelo_submodelo'
-
 class MaoRestauro(models.Model):
     id_mao_de_obra = models.ForeignKey(MaoDeObra, on_delete=models.CASCADE, db_column='id_mao_de_obra')
     id_restauro = models.ForeignKey(Restauro, on_delete=models.CASCADE, db_column='id_restauro')
@@ -118,13 +100,3 @@ class EspecialidadeUsuarios(models.Model):
     class Meta:
         db_table = 'especialidade_usuarios'
         unique_together = ('id_especialidade', 'id_usuarios')
-
-class SubModelos(models.Model):
-    id_sub_modelo = models.AutoField(primary_key=True)
-    nome = models.CharField(max_length=30, blank=True, null=True)
-    potencia = models.IntegerField(blank=True, null=True)
-    motorizacao = models.CharField(max_length=30, blank=True, null=True)
-    tracao = models.CharField(max_length=30, blank=True, null=True)
-
-    class Meta:
-        db_table = 'sub_modelos'

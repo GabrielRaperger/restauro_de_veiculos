@@ -1,77 +1,117 @@
 {% extends "menu.html" %}
 
-{% block title %}Editar Veículo{% endblock %}
+{% block title %}Editar Veículo - Minha Aplicação{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Editar Veículo</h2>
-    
-    <form method="POST">
-        {% csrf_token %}
-        
-        <!-- Campo ID do Veículo (somente visualização) -->
-        <div class="form-group">
-            <label for="veiculo_id">ID do Veículo</label>
-            <input type="text" class="form-control" id="veiculo_id" value="{{ veiculo.id_veiculo }}" readonly>
-        </div>
-        
-        <div class="form-group">
-            <label for="marca">Marca</label>
-            <select class="form-control" id="marca" name="marca" required>
-                <option value="">Selecione uma marca</option>
-                {% for marca in marcas %}
-                    <option value="{{ marca.id_marca }}" {% if marca.id_marca == veiculo_data.marca_id %}selected{% endif %}>{{ marca.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
+<div class="veiculo-detalhes-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Editar Veículo</h2>
+        <a href="{% url 'app_bd2:ver_veiculo' veiculo.id_veiculo %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Visualização
+        </a>
+    </div>
 
-        <div class="form-group">
-            <label for="matricula">Matrícula</label>
-            <input type="text" class="form-control" id="matricula" name="matricula" value="{{ veiculo_data.matricula }}" placeholder="Digite a matrícula" required>
+    <div class="card">
+        <div class="card-header">
+            Preencha os detalhes abaixo
         </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <!-- Campo ID do Veículo (somente visualização) -->
+                <div class="form-group">
+                    <label for="veiculo_id">ID do Veículo</label>
+                    <input type="text" class="form-control" id="veiculo_id" value="{{ veiculo.id_veiculo }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="marca">Marca</label>
+                    <select class="form-control" id="marca" name="marca" required>
+                        <option value="">Selecione uma marca</option>
+                        {% for marca in marcas %}
+                            <option value="{{ marca.id_marca }}" {% if marca.id_marca == veiculo_data.marca_id %}selected{% endif %}>{{ marca.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label for="cor">Cor</label>
-            <select class="form-control" id="cor" name="cor" required>
-                <option value="">Selecione a cor do veículo</option>
-                {% for cor in cores %}
-                    <option value="{{ cor }}" {% if cor == veiculo_data.cor %}selected{% endif %}>{{ cor }}</option>
-                {% endfor %}
-            </select>
+                <div class="form-group">
+                    <label for="matricula">Matrícula</label>
+                    <input type="text" class="form-control" id="matricula" name="matricula" value="{{ veiculo_data.matricula }}" placeholder="Digite a matrícula" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cor">Cor</label>
+                    <select class="form-control" id="cor" name="cor" required>
+                        <option value="">Selecione a cor do veículo</option>
+                        {% for cor in cores %}
+                            <option value="{{ cor }}" {% if cor == veiculo_data.cor %}selected{% endif %}>{{ cor }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="potencia">Potência</label>
+                    <select class="form-control" id="potencia" name="potencia" required>
+                        <option value="">Selecione a potência</option>
+                        {% for potencia in potencias %}
+                            <option value="{{ potencia }}" {% if potencia == veiculo_data.potencia %}selected{% endif %}>{{ potencia }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tracao">Tração</label>
+                    <select class="form-control" id="tracao" name="tracao" required>
+                        <option value="">Selecione a tração</option>
+                        {% for tracao in tracoes %}
+                            <option value="{{ tracao }}" {% if tracao == veiculo_data.tracao %}selected{% endif %}>{{ tracao }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="combustivel">Combustível</label>
+                    <select class="form-control" id="combustivel" name="combustivel" required>
+                        <option value="">Selecione o tipo de combustível</option>
+                        {% for combustivel in combustiveis %}
+                            <option value="{{ combustivel }}" {% if combustivel == veiculo_data.combustivel %}selected{% endif %}>{{ combustivel }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    <a href="{% url 'app_bd2:ver_veiculo' veiculo.id_veiculo %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
         </div>
-
-        <div class="form-group">
-            <label for="potencia">Potência</label>
-            <select class="form-control" id="potencia" name="potencia" required>
-                <option value="">Selecione a potência</option>
-                {% for potencia in potencias %}
-                    <option value="{{ potencia }}" {% if potencia == veiculo_data.potencia %}selected{% endif %}>{{ potencia }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="tracao">Tração</label>
-            <select class="form-control" id="tracao" name="tracao" required>
-                <option value="">Selecione a tração</option>
-                {% for tracao in tracoes %}
-                    <option value="{{ tracao }}" {% if tracao == veiculo_data.tracao %}selected{% endif %}>{{ tracao }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="combustivel">Combustível</label>
-            <select class="form-control" id="combustivel" name="combustivel" required>
-                <option value="">Selecione o tipo de combustível</option>
-                {% for combustivel in combustiveis %}
-                    <option value="{{ combustivel }}" {% if combustivel == veiculo_data.combustivel %}selected{% endif %}>{{ combustivel }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        <a href="{% url 'app_bd2:ver_veiculo' veiculo.id_veiculo %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+    </div>
 </div>
+
+<style>
+    .veiculo-detalhes-container {
+        padding: 20px;
+    }
+
+    .card {
+        margin-top: 20px;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-primary, .btn-secondary {
+        margin: 0 5px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+</style>
 {% endblock %}

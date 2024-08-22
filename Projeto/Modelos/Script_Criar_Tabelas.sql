@@ -1,8 +1,4 @@
 -- Criação das tabelas
-CREATE TABLE modelo (
-    id_modelo SERIAL PRIMARY KEY,
-    nome VARCHAR(30) NOT NULL
-);
 
 CREATE TABLE marca (
     id_marca SERIAL PRIMARY KEY,
@@ -64,11 +60,6 @@ CREATE TABLE mao_de_obra (
     valor NUMERIC
 );
 
-CREATE TABLE modelo_submodelo (
-    id_sub_modelo SERIAL PRIMARY KEY,
-    id_modelo INTEGER REFERENCES modelo(id_modelo)
-);
-
 CREATE TABLE mao_restauro (
     id_mao_de_obra INTEGER REFERENCES mao_de_obra(id_mao_de_obra),
     id_restauro INTEGER REFERENCES restauro(id_restauro),
@@ -79,12 +70,4 @@ CREATE TABLE especialidade_usuarios (
     id_especialidade INTEGER REFERENCES especialidades(id_especialidade),
     id_usuarios INTEGER REFERENCES usuarios(id_usuarios),
     PRIMARY KEY (id_especialidade, id_usuarios)
-);
-
-CREATE TABLE sub_modelos (
-    id_sub_modelo SERIAL PRIMARY KEY,
-    nome VARCHAR(30),
-    potencia INTEGER,
-    motorizacao VARCHAR(30),
-    tracao VARCHAR(30)
 );

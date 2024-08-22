@@ -12,6 +12,9 @@ from django.contrib import messages
 import json
 from django.urls import reverse
 
+client = MongoClient('localhost', 27017)
+db = client['BD2'] 
+veiculos_collection = db["veiculos"]
 
 def dashboard(request):
     return render(request, 'dashboard.html', {'page_title': 'Dashboard'})
@@ -298,7 +301,7 @@ def ver_faturas(request, id_faturas):
     context = {}
     
     with connection.cursor() as cursor:
-        # Executa a função PostgreSQL
+        # Executa a função PostgreSQL para obter os dados da fatura
         cursor.callproc('buscar_dados_fatura', [id_faturas])
         result = cursor.fetchall()
         
@@ -311,15 +314,26 @@ def ver_faturas(request, id_faturas):
         # A função retorna uma única linha, então pegamos o primeiro item da lista
         if result_dict:
             fatura = result_dict[0]
+            
             # Se a mão de obra estiver em formato JSON, converte de volta para dicionário
             if fatura.get('mao_de_obra'):
                 fatura['mao_de_obra'] = json.loads(fatura['mao_de_obra'])
+            
+            # Obtemos o id_veiculo
+            id_veiculo = fatura.get('id_veiculo')
+            
+            if id_veiculo:
+                # Busca o veículo no MongoDB
+                veiculo = veiculos_collection.find_one({'pg_veiculo': id_veiculo})
+                fatura['matricula'] = veiculo.get('matricula', 'Não disponível')
+            else:
+                fatura['matricula'] = 'ID do veículo não encontrado'
+            
             context['fatura'] = fatura
         else:
             context['error'] = 'Fatura não encontrada.'
 
-
-    return render(request, 'faturas/ver_faturas.html',context)
+    return render(request, 'faturas/ver_faturas.html', context)
 
 def lista_saida(request):
     context = {}
@@ -513,16 +527,7 @@ def deletar_mao_de_obra(request, id_mao_de_obra):
         return redirect('app_bd2:lista_MaoDeObra')
     return render(request, 'mao_de_obra/confirmar_deletar.html', {'mao_de_obra': mao_de_obra})
 
-
-def reparacoes(request):
-    return render(request, 'reparacoes/lista_reparacoes.html')
-
-def veiculos(request):
-    return render(request, 'veiculos/lista_veiculos.html')
-
-####################################################################novo
-####################################################################novo
-#PARA DEVOLVER IDS DE CLIENTES E VEICULOS
+#--------------------- VEICULOS  --------------------------#
 
 def mostrar_veiculos_clientes():
     with connection.cursor() as cursor:
@@ -543,9 +548,6 @@ def mostrar_veiculos_clientes():
         clientes = [{"id": row[0], "nome": row[1], "nif": row[2]} for row in cursor.fetchall()]
 
     return veiculos, clientes
-
-client = MongoClient('localhost', 27017)
-db = client['BD2']  # Nome do banco de dados MongoDB
 
 def registar_veiculo(request):
     if request.method == 'POST':
@@ -590,13 +592,6 @@ def registar_veiculo(request):
     }
     return render(request, 'veiculos/registar_veiculo.html', context)
 
-
-#############LISTAR VEICULOS############
-
-def ver_veiculo(request, id_veiculo):
-    veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
-    return render(request, 'veiculos/ver_veiculo.html', {'veiculo': veiculo})
-
 def listar_veiculos(request):
     veiculos = []
 
@@ -630,8 +625,6 @@ def listar_veiculos(request):
 
     return render(request, 'veiculos/lista_veiculos.html', {'veiculos': veiculos, 'page_title': 'Lista de Veículos'})
 
-##############VER DADOS VEICULO
-
 def ver_veiculo(request, id_veiculo):
     # Recuperar o veículo do PostgreSQL
     veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
@@ -643,7 +636,7 @@ def ver_veiculo(request, id_veiculo):
     # Preparar dados para exibição
     context = {
         'veiculo': veiculo,
-        'marca': veiculo.id_marca.nome if hasattr(veiculo.id_marca, 'nome') else 'Marca não definida',
+       
         'matricula': mongo_veiculo.get('matricula', 'Não disponível') if mongo_veiculo else 'Não disponível',
         'cor': mongo_veiculo.get('cor', 'Não disponível') if mongo_veiculo else 'Não disponível',
         'potencia': mongo_veiculo.get('potencia', 'Não disponível') if mongo_veiculo else 'Não disponível',
@@ -652,9 +645,6 @@ def ver_veiculo(request, id_veiculo):
     }
     
     return render(request, 'veiculos/ver_dados_veiculo.html', context)
-
-
-############  EDITAR VEICULO
 
 def editar_veiculo(request, id_veiculo):
     veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
@@ -719,9 +709,6 @@ def editar_veiculo(request, id_veiculo):
     }
     return render(request, 'veiculos/editar_veiculo.html', context)
 
-
-
-###################   ELIMINAR
 def eliminar_veiculo(request, id_veiculo):
     if request.method == 'POST':
         # Excluindo o veículo do PostgreSQL
@@ -736,3 +723,8 @@ def eliminar_veiculo(request, id_veiculo):
 
     # Se o método não for POST, redireciona para a página do veículo
     return redirect('app_bd2:ver_veiculo', id_veiculo=id_veiculo)
+
+#--------------------- REPARACOES  --------------------------#
+
+def reparacoes(request):
+    return render(request, 'reparacoes/lista_reparacoes.html')
