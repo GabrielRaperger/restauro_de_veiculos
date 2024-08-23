@@ -780,13 +780,18 @@ def editar_veiculo(request, id_veiculo):
 
 def eliminar_veiculo(request, id_veiculo):
     if request.method == 'POST':
-        # Excluindo o veículo do PostgreSQL
-        veiculo = get_object_or_404(Veiculo, pk=id_veiculo)
-        veiculo.delete()
+        try:
+            # Chamar a função SQL para excluir o veículo no PostgreSQL
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT excluir_veiculo(%s);", [id_veiculo])
 
-        # Excluindo o veículo do MongoDB
-        collection = db['veiculos']
-        collection.delete_one({'pg_veiculo': id_veiculo})
+            # Excluindo o veículo do MongoDB
+            collection = db['veiculos']
+            collection.delete_one({'pg_veiculo': id_veiculo})
+
+        except Exception as e:
+            print(f"Erro ao excluir veículo: {e}")
+            # Aqui você pode adicionar tratamento de erro, como redirecionar para uma página de erro
 
         return redirect('app_bd2:listar_veiculos')  # Redireciona para a lista de veículos
 
@@ -909,3 +914,118 @@ def listar_encarregado_logado_reparacoes(request):
     return render(request, 'template_trabalhador/listar_reparacoes.html', {
         'reparacoes': reparacoes_com_matriculas
     })
+
+
+
+
+############# REPARAÇÕES          #################
+
+def listar_reparacoes(request):
+    reparacoes = []
+
+    try:
+        with connection.cursor() as cursor:
+            # Consulta SQL para obter id_restauro, id_veiculo, e data_entrada
+            cursor.execute("""
+                SELECT
+                    restauro.id_restauro,
+                    entrada.id_veiculo,
+                    entrada.data AS data_entrada
+                FROM restauro
+                JOIN entrada ON restauro.id_entrada = entrada.id_entrada
+            """)
+            resultados = cursor.fetchall()
+            print("Resultados da consulta SQL:", resultados)  # Log para depuração
+
+            # Buscar todos os veículos no MongoDB para criar um dicionário id_veiculo -> matrícula
+            collection = db['veiculos']
+            mongo_veiculos = collection.find()
+
+            # Mapear o pg_veiculo (id_veiculo do PostgreSQL) para a matrícula
+            matriculas = {v.get('pg_veiculo'): v.get('matricula', 'Não disponível') for v in mongo_veiculos}
+            print("Dados do MongoDB:", matriculas)  # Log para depuração
+
+            # Processar os resultados e mapear as matrículas
+            for row in resultados:
+                id_restauro = row[0]
+                id_veiculo = row[1]
+                matricula = matriculas.get(id_veiculo, 'Não disponível')  # Obter matrícula do dicionário
+                reparacoes.append({
+                    'id_restauro': id_restauro,
+                    'matricula': matricula,
+                    'data_entrada': row[2],
+                    'tarefas': []
+                })
+
+                # Consultar as tarefas associadas à reparação
+                cursor.execute("""
+                    SELECT mao_de_obra.nome
+                    FROM mao_restauro
+                    JOIN mao_de_obra ON mao_restauro.id_mao_de_obra = mao_de_obra.id_mao_de_obra
+                    WHERE mao_restauro.id_restauro = %s
+                """, [id_restauro])
+                tarefas = cursor.fetchall()
+
+                reparacoes[-1]['tarefas'] = [tarefa[0] for tarefa in tarefas]
+
+    except Exception as e:
+        print("Erro ao consultar o banco de dados:", e)
+
+    print("Dados enviados para o template:", reparacoes)  # Log para depuração
+
+    return render(request, 'reparacoes/lista_reparacoes.html', {'reparacoes': reparacoes, 'page_title': 'Lista de Restaurações'})
+
+
+##############  VER DADOS REPARACOES   #############
+
+def ver_reparacao(request, id):
+    try:
+        with connection.cursor() as cursor:
+            # Consultar detalhes da reparação no PostgreSQL
+            cursor.execute("""
+                SELECT
+                    restauro.id_restauro,
+                    entrada.id_veiculo,
+                    entrada.data AS data_entrada,
+                    restauro.valor_restauro
+                FROM restauro
+                JOIN entrada ON restauro.id_entrada = entrada.id_entrada
+                WHERE restauro.id_restauro = %s
+            """, [id])
+            resultado = cursor.fetchone()
+
+            if resultado:
+                id_restauro = resultado[0]
+                id_veiculo = resultado[1]
+                data_entrada = resultado[2]
+                valor_restauro = resultado[3]
+
+                # Buscar tarefas associadas à reparação
+                cursor.execute("""
+                    SELECT mao_de_obra.nome
+                    FROM mao_restauro
+                    JOIN mao_de_obra ON mao_restauro.id_mao_de_obra = mao_de_obra.id_mao_de_obra
+                    WHERE mao_restauro.id_restauro = %s
+                """, [id])
+                tarefas = cursor.fetchall()
+
+                # Buscar matrícula no MongoDB
+                collection = db['veiculos']
+                mongo_veiculo = collection.find_one({'pg_veiculo': id_veiculo})
+                matricula = mongo_veiculo.get('matricula', 'Não disponível') if mongo_veiculo else 'Não disponível'
+
+                contexto = {
+                    'id_restauro': id_restauro,
+                    'matricula': matricula,
+                    'data_entrada': data_entrada,
+                    'valor_restauro': valor_restauro,
+                    'tarefas': [tarefa[0] for tarefa in tarefas]
+                }
+            else:
+                contexto = {'error': 'Restauração não encontrada'}
+
+    except Exception as e:
+        print("Erro ao consultar o banco de dados:", e)
+        contexto = {'error': 'Erro ao recuperar dados'}
+
+    return render(request, 'reparacoes/ver_reparacao.html', contexto)

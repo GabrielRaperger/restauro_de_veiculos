@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import adicionar_cliente, adicionar_encarregado, clientes, dashboard, encarregados, lista_MaoDeObra, lista_faturas, reparacoes, ver_faturas, lista_saida, adicionar_mao_de_obra, registar_veiculo, listar_veiculos
+from .views import adicionar_cliente, adicionar_encarregado, clientes, dashboard, encarregados, lista_MaoDeObra, lista_faturas, reparacoes, ver_faturas, lista_saida, adicionar_mao_de_obra, registar_veiculo, listar_veiculos, listar_reparacoes
 from . import views
 
 app_name = 'app_bd2'
@@ -42,4 +42,10 @@ urlpatterns = [
     path('veiculos/ver/<int:id_veiculo>/', views.ver_veiculo, name='ver_veiculo'),
     path('veiculos/editar/<int:id_veiculo>/', views.editar_veiculo, name='editar_veiculo'),
     path('veiculo/eliminar/<int:id_veiculo>/', views.eliminar_veiculo, name='eliminar_veiculo'),
+
+    ##### REPARAÇÕES  #####
+    path('reparacoes/', listar_reparacoes, name='listar_reparacoes'),
+    path('reparacoes/<int:id>/', views.ver_reparacao, name='ver_reparacao'),  # URL para visualizar detalhes de uma reparação
+
+
 ]

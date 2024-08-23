@@ -1,0 +1,28 @@
+{% extends "menu.html" %}
+
+{% block title %}Detalhes da Restauração{% endblock %}
+
+{% block content %}
+<div class="detalhes-reparacao-container">
+    <h2>Detalhes da Restauração {{ id_restauro }}</h2>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% else %}
+        <p><strong>ID Restauro:</strong> {{ id_restauro }}</p>
+        <p><strong>Matrícula:</strong> {{ matricula }}</p>
+        <p><strong>Data de Entrada:</strong> {{ data_entrada }}</p>
+        <p><strong>Valor do Restauro:</strong> {{ valor_restauro }}</p>
+        <h3>Tarefas:</h3>
+        <ul>
+            {% if tarefas %}
+                {% for tarefa in tarefas %}
+                    <li>{{ tarefa }}</li>
+                {% endfor %}
+            {% else %}
+                <p>Sem tarefas de mão de obra</p>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}
