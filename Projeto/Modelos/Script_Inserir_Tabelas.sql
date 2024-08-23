@@ -1,30 +1,16 @@
--- Inserir dados na tabela modelo com IDs manuais
-INSERT INTO modelo (id_modelo, nome) 
-VALUES 
-(1, 'Modelo Alfa'),
-(2, 'Modelo Beta'),
-(3, 'Modelo Gamma'),
-(4, 'Modelo Delta'),
-(5, 'Modelo Epsilon'),
-(6, 'Modelo Zeta'),
-(7, 'Modelo Eta'),
-(8, 'Modelo Theta'),
-(9, 'Modelo Iota'),
-(10, 'Modelo Kappa');
-
 -- Inserir dados na tabela marca com IDs manuais
-INSERT INTO marca (id_marca, id_modelo, nome) 
+INSERT INTO marca (id_marca, nome) 
 VALUES 
-(1, 1, 'Marca Alpha 1'),
-(2, 1, 'Marca Alpha 2'),
-(3, 2, 'Marca Beta 1'),
-(4, 2, 'Marca Beta 2'),
-(5, 3, 'Marca Gamma 1'),
-(6, 3, 'Marca Gamma 2'),
-(7, 4, 'Marca Delta 1'),
-(8, 4, 'Marca Delta 2'),
-(9, 5, 'Marca Epsilon 1'),
-(10, 5, 'Marca Epsilon 2');
+(1, 'Marca Alpha 1'),
+(2, 'Marca Alpha 2'),
+(3, 'Marca Beta 1'),
+(4, 'Marca Beta 2'),
+(5, 'Marca Gamma 1'),
+(6, 'Marca Gamma 2'),
+(7, 'Marca Delta 1'),
+(8, 'Marca Delta 2'),
+(9, 'Marca Epsilon 1'),
+(10, 'Marca Epsilon 2');
 
 -- Inserir dados na tabela usuarios com IDs manuais
 INSERT INTO usuarios (id_usuarios, nome, nif, telemovel, endereco, email) 

@@ -2,7 +2,6 @@
 
 CREATE TABLE marca (
     id_marca SERIAL PRIMARY KEY,
-    id_modelo INTEGER REFERENCES modelo(id_modelo),
     nome VARCHAR(30) NOT NULL
 );
 
