@@ -61,7 +61,7 @@
                 {% if request.user.groups.all.0.name == "Administrador" %}
                 <a href="{% url 'app_bd2:dashboard' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-home"></i> Início</a>
                 <a href="{% url 'app_bd2:listar_veiculos' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-car"></i> Veículos</a>
-                <a href="{% url 'app_bd2:reparacoes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-tools"></i> Reparações</a>
+                <a href="{% url 'app_bd2:listar_reparacoes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-tools"></i> Reparações</a>
                 <a href="{% url 'app_bd2:clientes' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-users"></i> Clientes</a>
                 <a href="{% url 'app_bd2:encarregados' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-tie"></i> Encarregados</a>
                 <a href="{% url 'app_bd2:lista_faturas' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-file-invoice"></i> Faturas</a>

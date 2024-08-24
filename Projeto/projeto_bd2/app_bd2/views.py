@@ -622,28 +622,31 @@ def registar_veiculo(request):
     if request.method == 'POST':
         veiculo_id = request.POST.get('veiculo_id')
         cliente_id = request.POST.get('cliente_id')
-        #matricula
         matricula = request.POST.get('matricula')
-         #matricula
         cor = request.POST.get('cor')
         potencia = request.POST.get('potencia')
         tracao = request.POST.get('tracao')
         combustivel = request.POST.get('combustivel')
 
+        # Inserindo o veículo no banco de dados PostgreSQL
         with connection.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO veiculo (id_marca, id_usuarios)
                 VALUES (%s, %s) RETURNING id_veiculo
             """, [veiculo_id, cliente_id])
             pg_veiculo_id = cursor.fetchone()[0]
-     
+
+            # Ajustar a sequência para o próximo valor disponível
+            cursor.execute("""
+                SELECT setval('veiculo_id_veiculo_seq', COALESCE((SELECT MAX(id_veiculo) FROM veiculo), 1));
+                """)
+            connection.commit()
 
         # Salvar no MongoDB
-        collection = db['veiculos']  # Nome da coleção (equivalente à tabela no SQL)
+        collection = db['veiculos']
         novo_veiculo = {
-            'pg_veiculo': pg_veiculo_id,  # Usa o ID gerado pelo PostgreSQL
-           # 'cliente_id': cliente_id,
-           'matricula': matricula,  # Inclui a matrícula
+            'pg_veiculo': pg_veiculo_id,
+            'matricula': matricula,
             'cor': cor,
             'potencia': potencia,
             'tracao': tracao,
@@ -651,10 +654,34 @@ def registar_veiculo(request):
         }
         collection.insert_one(novo_veiculo)
 
-        #return redirect('veiculos')
+        # Redirecionar após o sucesso
+        return redirect('app_bd2:listar_veiculos')
 
-    # Lógica para obter marcas e clientes e renderizar a página
-    veiculos, clientes = mostrar_veiculos_clientes()
+    # Obter marcas de veículos
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_marca, nome FROM marca")
+            veiculos = [{'id': v[0], 'nome': v[1]} for v in cursor.fetchall()]
+    except Exception as e:
+        print(f"Erro ao obter marcas: {e}")
+        veiculos = []
+
+    # Obter clientes do grupo "Cliente"
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT usuarios.id_usuarios, usuarios.nome, usuarios.nif
+                FROM usuarios
+                JOIN auth_user ON usuarios.user_id = auth_user.id
+                JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
+                JOIN auth_group ON auth_user_groups.group_id = auth_group.id
+                WHERE auth_group.name = 'Cliente'
+            """)
+            clientes = [{'id': c[0], 'nome': c[1], 'nif': c[2]} for c in cursor.fetchall()]
+    except Exception as e:
+        print(f"Erro ao obter clientes: {e}")
+        clientes = []
+
     context = {
         'veiculos': veiculos,
         'clientes': clientes,
@@ -701,6 +728,7 @@ def ver_veiculo(request, id_veiculo):
     # Recuperar dados do MongoDB
     collection = db['veiculos']
     mongo_veiculo = collection.find_one({'pg_veiculo': id_veiculo})
+    
     
     # Preparar dados para exibição
     context = {
@@ -781,11 +809,19 @@ def editar_veiculo(request, id_veiculo):
 def eliminar_veiculo(request, id_veiculo):
     if request.method == 'POST':
         try:
-            # Chamar a função SQL para excluir o veículo no PostgreSQL
+            # Excluir o veículo do PostgreSQL
             with connection.cursor() as cursor:
+                # Execute a função SQL para excluir o veículo
                 cursor.execute("SELECT excluir_veiculo(%s);", [id_veiculo])
+                
+                # Ajustar a sequência após a exclusão
+                cursor.execute("""
+                    SELECT setval('veiculo_id_veiculo_seq', COALESCE((SELECT MAX(id_veiculo) FROM veiculo), 1), true);
+                """)
+                
+                connection.commit()
 
-            # Excluindo o veículo do MongoDB
+            # Excluir o veículo do MongoDB
             collection = db['veiculos']
             collection.delete_one({'pg_veiculo': id_veiculo})
 
@@ -1028,4 +1064,4 @@ def ver_reparacao(request, id):
         print("Erro ao consultar o banco de dados:", e)
         contexto = {'error': 'Erro ao recuperar dados'}
 
-    return render(request, 'reparacoes/ver_reparacao.html', contexto)
+    return render(request, 'reparacoes/ver_reparacoes.html', contexto)

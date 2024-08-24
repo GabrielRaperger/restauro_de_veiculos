@@ -33,8 +33,7 @@ urlpatterns = [
     path('mao_de_obra/<int:id_mao_de_obra>/editar/', views.editar_mao_de_obra, name='editar_mao_de_obra'),
     path('mao_de_obra/<int:id_mao_de_obra>/deletar/', views.deletar_mao_de_obra, name='deletar_mao_de_obra'),
 
-    #------------------- REPARACOES ----------------------#
-    path('reparacoes/', reparacoes, name='reparacoes'),
+    
 
     #------------------- VEICULOS  ----------------------#
     path('veiculos/registar/', registar_veiculo, name='registar_veiculo'),
