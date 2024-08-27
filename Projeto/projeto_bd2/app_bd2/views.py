@@ -1287,11 +1287,6 @@ def editar_reparacao(request, id_restauro):
         }
         return render(request, 'reparacoes/editar_reparacao.html', context)
 
-def eliminar_reparacao(request,id):
-    return render(request, 'reparacoes/ver_reparacoes.html')
-
-
-
 def eliminar_reparacao(request, id_restauro):
     if request.method == "POST":
             with connection.cursor() as cursor:
@@ -1299,7 +1294,7 @@ def eliminar_reparacao(request, id_restauro):
                 cursor.execute("SELECT excluir_restauro(%s)", [id_restauro])
                 result = cursor.fetchone()[0]  # Captura a mensagem de retorno da função
                 if "sucesso" in result.lower():
-                    messages.error(request, 'O restauro foi excluido com sucesso')
+                    messages.success(request, 'O restauro foi excluido com sucesso')
                     return redirect('app_bd2:listar_reparacoes')
                 else:
                     messages.error(request, 'O Restauro não pode ser excluído pois já tem tarefas concluídas.')
