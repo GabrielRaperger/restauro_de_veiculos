@@ -47,6 +47,37 @@ END;
 $$;
 
 ---------------------------------- ENCARREGADOS -----------------------------------------
+
+CREATE OR REPLACE FUNCTION criar_restauro(
+    p_id_veiculo integer,
+    p_mao_de_obras_ids integer[])
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_id_entrada INTEGER;
+    v_id_restauro INTEGER;
+BEGIN
+    -- Inserir nova entrada e obter o id_entrada
+    INSERT INTO entrada (id_veiculo, data)
+    VALUES (p_id_veiculo, NOW())
+    RETURNING id_entrada INTO v_id_entrada;
+
+    -- Criar novo restauro e obter o id_restauro
+    INSERT INTO restauro (id_entrada)
+    VALUES (v_id_entrada)
+    RETURNING id_restauro INTO v_id_restauro;
+
+    -- Associar MaoDeObra ao Restauro
+    INSERT INTO mao_restauro (id_mao_de_obra, id_restauro)
+    SELECT unnest(p_mao_de_obras_ids), v_id_restauro;
+
+    RETURN v_id_restauro;
+END;
+$BODY$;
+
 CREATE OR REPLACE FUNCTION excluir_restauro(p_restauro_id INTEGER)
 RETURNS TEXT AS $$
 DECLARE
