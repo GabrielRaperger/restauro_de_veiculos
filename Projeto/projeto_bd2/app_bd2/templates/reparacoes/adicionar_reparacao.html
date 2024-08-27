@@ -1,0 +1,88 @@
+{% extends "menu.html" %}
+
+{% block title %}Criar Novo Restauro - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="restauro-form-container">
+    <h2 class="mb-4">Criar Novo Restauro</h2>
+    
+    <div class="card">
+        <div class="card-header">
+            Preencha os detalhes abaixo
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'app_bd2:admin_criar_restauro' %}">
+                {% csrf_token %}
+
+                <!-- Cliente -->
+                <div class="form-group mt-3">
+                    <label for="cliente_id">Cliente</label>
+                    <select class="form-control" id="cliente_id" name="cliente_id" required>
+                        <option value="">Selecione um cliente</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">{{ cliente.nome }} : {{ cliente.nif }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Veículo -->
+                <div class="form-group mt-3">
+                    <label for="veiculo_id">Veículo</label>
+                    <select class="form-control" id="veiculo_id" name="veiculo_id" required>
+                        <option value="">Selecione um veículo</option>
+                    </select>
+                </div>
+
+                <!-- Mão de Obra -->
+                <div class="form-group mt-3">
+                    <label for="mao_de_obra">Mão de Obra</label>
+                    <div id="mao_de_obra">
+                        {% for mao in mao_de_obras %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="mao_de_obra" value="{{ mao.id }}" id="mao_obra_{{ mao.id }}">
+                                <label class="form-check-label" for="mao_obra_{{ mao.id }}">
+                                    {{ mao.nome }} (<b>Valor: </b>{{ mao.valor }})
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Registrar Restauro</button>
+                <a href="{% url 'app_bd2:listar_reparacoes' %}" class="btn btn-secondary mt-4">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('cliente_id').addEventListener('change', function() {
+        var clienteId = this.value;
+        var veiculoSelect = document.getElementById('veiculo_id');
+
+        veiculoSelect.innerHTML = '<option value="">Selecione um veículo</option>';
+
+        if (clienteId) {
+            // Ajustar o caminho para incluir /dashboard/
+            fetch(`/dashboard/get_veiculos_por_cliente/?cliente_id=${clienteId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    data.forEach(veiculo => {
+                        var option = document.createElement('option');
+                        option.value = veiculo.id_veiculo;
+                        // Concatena matrícula e cor no texto do option
+                        option.text = `Matricula: ${veiculo.matricula}, Cor: ${veiculo.cor} `;
+                        veiculoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar veículos:', error));
+        }
+    });
+</script>
+
+{% endblock %}

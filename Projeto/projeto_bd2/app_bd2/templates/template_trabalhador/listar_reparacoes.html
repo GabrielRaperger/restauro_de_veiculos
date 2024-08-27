@@ -6,11 +6,6 @@
 <div class="clientes-table-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Lista de Reparações</h2>
-        {% if request.user.groups.all.0.name == "Trabalhador" %}
-        <a href="{% url 'app_bd2:adicionar_cliente' %}" class="btn btn-success ml-auto">
-            <i class="fas fa-plus"></i> Criar Reparação
-        </a>
-        {% endif %}
     </div>
 
     <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por nome">
@@ -32,7 +27,15 @@
                 <td>{{ reparacao.id_restauro }}</td>
                 <td>{{ reparacao.data_entrada }}</td>
                 <td>{{ reparacao.mao_de_obra_nome }}</td>
-                <td>{{ reparacao.matricula }}</td>
+                <td>{{ reparacao.matricula }}</td>~
+                <td>
+                    <form method="post" action="{% url 'app_bd2:encarregado_concluir_reparacao' id_restauro=reparacao.id_restauro %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Tem certeza de que deseja concluir o trabalho nesse veiculo?');">
+                            <i class="fas fa-check"></i> Concluir
+                        </button>
+                    </form>
+                </td>
             </tr>
             {% empty %}
             <tr>

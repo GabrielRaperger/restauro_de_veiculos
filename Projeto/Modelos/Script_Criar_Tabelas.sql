@@ -1,17 +1,15 @@
--- Criação das tabelas
-
 CREATE TABLE marca (
     id_marca SERIAL PRIMARY KEY,
-    nome VARCHAR(30) NOT NULL
+    nome VARCHAR(50) NOT NULL -- Aumentado para 50 caracteres
 );
 
 CREATE TABLE usuarios (
     id_usuarios SERIAL PRIMARY KEY,
-    nome VARCHAR(30) NOT NULL,
-    nif VARCHAR(9),
-    telemovel VARCHAR(12),
-    endereco VARCHAR(50),
-    email VARCHAR(40)
+    nome VARCHAR(50) NOT NULL, -- Aumentado para 50 caracteres
+    nif VARCHAR(12), -- Aumentado para 12 caracteres
+    telemovel VARCHAR(15), -- Aumentado para 15 caracteres
+    endereco VARCHAR(100), -- Aumentado para 100 caracteres
+    email VARCHAR(60) -- Aumentado para 60 caracteres
 );
 
 CREATE TABLE veiculo (
@@ -28,14 +26,12 @@ CREATE TABLE entrada (
 
 CREATE TABLE restauro (
     id_restauro SERIAL PRIMARY KEY,
-    id_entrada INTEGER REFERENCES entrada(id_entrada),
-    valor_restauro NUMERIC
-    -- Não há referência para a tabela saida
+    id_entrada INTEGER REFERENCES entrada(id_entrada)
 );
 
 CREATE TABLE saida (
     id_saida SERIAL PRIMARY KEY,
-    id_restauro INTEGER REFERENCES restauro(id_restauro),  -- Adicionada referência à tabela restauro
+    id_restauro INTEGER REFERENCES restauro(id_restauro),
     data TIMESTAMP
 );
 
@@ -49,19 +45,20 @@ CREATE TABLE faturas (
 
 CREATE TABLE especialidades (
     id_especialidade SERIAL PRIMARY KEY,
-    nome VARCHAR(30) NOT NULL
+    nome VARCHAR(50) NOT NULL -- Aumentado para 50 caracteres
 );
 
 CREATE TABLE mao_de_obra (
     id_mao_de_obra SERIAL PRIMARY KEY,
     id_usuarios INTEGER REFERENCES usuarios(id_usuarios),
-    nome VARCHAR(30),
+    nome VARCHAR(50), -- Aumentado para 50 caracteres
     valor NUMERIC
 );
 
 CREATE TABLE mao_restauro (
     id_mao_de_obra INTEGER REFERENCES mao_de_obra(id_mao_de_obra),
     id_restauro INTEGER REFERENCES restauro(id_restauro),
+    estado BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (id_mao_de_obra, id_restauro)
 );
 

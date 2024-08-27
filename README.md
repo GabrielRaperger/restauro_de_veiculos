@@ -43,6 +43,12 @@ Executar os scripts de criação e inserção da pasta Modelos
 
 Na raíz do projeto onde se situa o "manage.py" correr o seguinte comando:
 
+## Executar no CMD
+``` 
+pip install psycopg2
+pip install pymongo
+```
+
 ```shell
 python manage.py setup_users
 ```

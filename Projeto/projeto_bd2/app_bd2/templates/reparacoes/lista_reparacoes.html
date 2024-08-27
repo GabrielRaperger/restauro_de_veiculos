@@ -3,11 +3,21 @@
 {% block title %}Restaurações - Minha Aplicação{% endblock %}
 
 {% block content %}
-<div class="reparacoes-table-container">
+<div class="clientes-table-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Lista de Restaurações</h2>
-        <!-- Sem botão de adicionar por enquanto -->
+        <a href="{% url 'app_bd2:admin_criar_restauro' %}" class="btn btn-success ml-auto">
+            <i class="fas fa-plus"></i> Criar Reparação
+        </a>
+
     </div>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
     <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por matrícula ou data de entrada">
 
@@ -29,11 +39,20 @@
                 <td>{{ reparacao.data_entrada }}</td>
                 <td>
                     {% if reparacao.tarefas %}
-                        <ul>
-                            {% for tarefa in reparacao.tarefas %}
-                                <li>{{ tarefa }}</li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="list-unstyled">
+                        {% for tarefa in reparacao.tarefas %}
+                        <li>
+                            {% if tarefa.estado == 'Completa' %}
+                            <i class="fas fa-check-circle text-success"></i>
+                        {% else %}
+                            <i class="fas fa-times-circle text-danger"></i>
+                        {% endif %}
+                            {{ tarefa.nome }} 
+                        </li>
+                        {% empty %}
+                        <li>Nenhuma tarefa encontrada.</li>
+                        {% endfor %}
+                    </ul>
                     {% else %}
                         <p>Sem tarefas de mão de obra</p>
                     {% endif %}

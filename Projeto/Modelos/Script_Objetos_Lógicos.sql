@@ -47,6 +47,91 @@ END;
 $$;
 
 ---------------------------------- ENCARREGADOS -----------------------------------------
+CREATE OR REPLACE FUNCTION excluir_restauro(p_restauro_id INTEGER)
+RETURNS TEXT AS $$
+DECLARE
+    mao_de_obra_ativa_count INTEGER;
+    entrada_id INTEGER;
+BEGIN
+    -- Contar as mãos de obra com estado = TRUE
+    SELECT COUNT(*)
+    INTO mao_de_obra_ativa_count
+    FROM mao_restauro
+    WHERE id_restauro = p_restauro_id AND estado = TRUE;
+
+    -- Se houver alguma mão de obra com estado = TRUE, impedir a exclusão
+    IF mao_de_obra_ativa_count > 0 THEN
+        RETURN 'Não é possível excluir este restauro, pois ele contém mãos de obra concluídas.';
+    END IF;
+
+    -- Obter o id_entrada associado ao restauro
+    SELECT id_entrada
+    INTO entrada_id
+    FROM restauro
+    WHERE id_restauro = p_restauro_id;
+
+    -- Excluir as associações entre o restauro e as mãos de obra
+    DELETE FROM mao_restauro
+    WHERE id_restauro = p_restauro_id;
+
+    -- Excluir o restauro
+    DELETE FROM restauro
+    WHERE id_restauro = p_restauro_id;
+
+    -- Excluir a entrada associada ao restauro
+    DELETE FROM entrada
+    WHERE id_entrada = entrada_id;
+
+    RETURN 'Restauro excluído com sucesso.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION editar_restauro(
+    p_restauro_id INTEGER,
+    p_veiculo_id INTEGER,
+    p_mao_de_obras_ids INTEGER[]
+)
+RETURNS VOID AS $$
+BEGIN
+    -- Atualiza o veículo na tabela de entrada com base no id_restauro
+    UPDATE entrada
+    SET id_veiculo = p_veiculo_id
+    FROM restauro
+    WHERE entrada.id_entrada = restauro.id_entrada
+    AND restauro.id_restauro = p_restauro_id;
+
+    -- Remove as associações antigas entre o restauro e as mãos de obra com estado False
+    DELETE FROM mao_restauro
+    WHERE id_restauro = p_restauro_id
+    AND estado = FALSE;
+
+    -- Insere as novas associações entre o restauro e as mãos de obra com estado False
+    INSERT INTO mao_restauro (id_restauro, id_mao_de_obra, estado)
+    SELECT p_restauro_id, unnest(p_mao_de_obras_ids), FALSE
+    ON CONFLICT (id_restauro, id_mao_de_obra) DO NOTHING;
+
+    
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION concluir_restauro(usuario_id INTEGER, restauro_id INTEGER)
+RETURNS VOID AS $$
+BEGIN
+ 
+    UPDATE mao_restauro
+    SET estado = TRUE
+    WHERE id_mao_de_obra IN (
+        SELECT id_mao_de_obra
+        FROM mao_de_obra
+        WHERE id_usuarios = usuario_id
+    )
+    AND id_restauro = restauro_id;
+
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE PROCEDURE proc_inserir_encarregado(
     p_username VARCHAR,
     p_first_name VARCHAR,
@@ -102,6 +187,39 @@ BEGIN
     DELETE FROM auth_user WHERE id = p_user_id;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION verificar_reparacao_completa()
+RETURNS TRIGGER AS $$
+DECLARE
+    todas_concluidas BOOLEAN;
+    saida_existente BOOLEAN;
+BEGIN
+    -- Verificar se todas as entradas de mao_restauro para um dado id_restauro estão com estado = TRUE
+    SELECT BOOL_AND(estado) INTO todas_concluidas
+    FROM mao_restauro
+    WHERE id_restauro = NEW.id_restauro;
+
+    -- Verificar se já existe uma entrada para este id_restauro na tabela saida
+    SELECT EXISTS (
+        SELECT 1 
+        FROM saida 
+        WHERE id_restauro = NEW.id_restauro
+    ) INTO saida_existente;
+
+    -- Se todas as entradas estiverem concluídas e não houver entrada na tabela saida, insere um registro
+    IF todas_concluidas AND NOT saida_existente THEN
+        INSERT INTO saida (id_restauro, data)
+        VALUES (NEW.id_restauro, NOW());
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;~
+
+CREATE TRIGGER trg_verificar_reparacao_completa
+AFTER INSERT OR UPDATE ON mao_restauro
+FOR EACH ROW
+EXECUTE FUNCTION verificar_reparacao_completa();
 
 ---------------------------------- FATURAS -----------------------------------------
 
@@ -281,10 +399,10 @@ CREATE OR REPLACE FUNCTION criar_fatura(p_id_saida INTEGER)
 RETURNS INTEGER AS $$
 DECLARE
     v_id_usuario INTEGER;
-    v_valor_restauro NUMERIC;
+    v_valor_total NUMERIC := 0;
     v_id_faturas INTEGER;
 BEGIN
-    
+    -- Obter o ID do usuário associado ao veículo na saída
     SELECT v.id_usuarios INTO v_id_usuario
     FROM saida s
     JOIN restauro r ON s.id_restauro = r.id_restauro
@@ -292,28 +410,32 @@ BEGIN
     JOIN veiculo v ON e.id_veiculo = v.id_veiculo
     WHERE s.id_saida = p_id_saida;
     
-    
+    -- Se o usuário não for encontrado, lançar uma exceção
     IF v_id_usuario IS NULL THEN
         RAISE EXCEPTION 'Usuário não encontrado para a saída %', p_id_saida;
     END IF;
     
-    
-    SELECT r.valor_restauro INTO v_valor_restauro
-    FROM saida s
-    JOIN restauro r ON s.id_restauro = r.id_restauro
+    -- Calcular o valor total do restauro baseado na soma dos valores de mão de obra
+    SELECT COALESCE(SUM(mo.valor), 0) INTO v_valor_total
+    FROM mao_restauro mr
+    JOIN mao_de_obra mo ON mr.id_mao_de_obra = mo.id_mao_de_obra
+    JOIN restauro r ON mr.id_restauro = r.id_restauro
+    JOIN saida s ON r.id_restauro = s.id_restauro
     WHERE s.id_saida = p_id_saida;
     
-    
+    -- Inserir a nova fatura
     INSERT INTO faturas (id_saida, id_usuarios, data_emissao, valor_total)
-    VALUES (p_id_saida, v_id_usuario, CURRENT_TIMESTAMP, v_valor_restauro)
+    VALUES (p_id_saida, v_id_usuario, CURRENT_TIMESTAMP, v_valor_total)
     RETURNING id_faturas INTO v_id_faturas;
 
-    
+    -- Retornar o ID da fatura gerada
     RETURN v_id_faturas;
 END;
 $$ LANGUAGE plpgsql;
 
+
 -------------------------------- MAO DE OBRA ------------------------------------
+
 CREATE OR REPLACE FUNCTION listar_trabalhadores_com_especialidade()
 RETURNS TABLE (id_usuarios INT, nome TEXT, especialidade TEXT) AS $$
 BEGIN

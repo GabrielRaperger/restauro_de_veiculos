@@ -43,7 +43,6 @@ class Entrada(models.Model):
 class Restauro(models.Model):
     id_restauro = models.AutoField(primary_key=True)
     id_entrada = models.ForeignKey(Entrada, on_delete=models.CASCADE, db_column='id_entrada')
-    valor_restauro = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         db_table = 'restauro'

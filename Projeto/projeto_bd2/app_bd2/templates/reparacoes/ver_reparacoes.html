@@ -1,28 +1,58 @@
 {% extends "menu.html" %}
 
-{% block title %}Detalhes da Restauração{% endblock %}
+{% block title %}Detalhes da Restauração - Minha Aplicação{% endblock %}
 
 {% block content %}
-<div class="detalhes-reparacao-container">
-    <h2>Detalhes da Restauração {{ id_restauro }}</h2>
+<div class="clientes-table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Detalhes da Restauração</h2>
+        <a href="{% url 'app_bd2:listar_reparacoes' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
 
     {% if error %}
-        <p>{{ error }}</p>
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
     {% else %}
-        <p><strong>ID Restauro:</strong> {{ id_restauro }}</p>
-        <p><strong>Matrícula:</strong> {{ matricula }}</p>
-        <p><strong>Data de Entrada:</strong> {{ data_entrada }}</p>
-        <p><strong>Valor do Restauro:</strong> {{ valor_restauro }}</p>
-        <h3>Tarefas:</h3>
-        <ul>
-            {% if tarefas %}
+    <div class="card">
+        <div class="card-header">
+            Detalhes da Restauração
+        </div>
+        <div class="card-body">
+            <p><strong>ID Restauro:</strong> {{ id_restauro }}</p>
+            <p><strong>Matrícula:</strong> {{ matricula }}</p>
+            <p><strong>Data de Entrada:</strong> {{ data_entrada }}</p>
+
+            <h3>Tarefas:</h3>
+            <ul class="list-unstyled">
                 {% for tarefa in tarefas %}
-                    <li>{{ tarefa }}</li>
+                <li>
+                    {% if tarefa.estado == 'Completa' %}
+                        <i class="fas fa-check-circle text-success"></i>
+                    {% else %}
+                        <i class="fas fa-times-circle text-danger"></i>
+                    {% endif %}
+                    {{ tarefa.nome }} (<b>Valor: </b>{{ tarefa.valor }})
+                </li>
+                {% empty %}
+                <li>Nenhuma tarefa encontrada.</li>
                 {% endfor %}
-            {% else %}
-                <p>Sem tarefas de mão de obra</p>
-            {% endif %}
-        </ul>
+            </ul>
+            <div class="mt-4">
+                <a href="{% url 'app_bd2:editar_reparacao' id_restauro  %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <form method="POST" action="{% url 'app_bd2:eliminar_reparacao' id_restauro %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit"  class="btn btn-danger" onclick="return confirm('Tem certeza de que deseja excluir esta restauração?');">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,72 @@
+{% extends "menu.html" %}
+
+{% block title %}Editar Restauro - Minha Aplicação{% endblock %}
+
+{% block content %}
+<div class="restauro-form-container">
+    <h2 class="mb-4">Editar Restauro</h2>
+    
+    <div class="card">
+        <div class="card-header">
+            Atualize os detalhes abaixo
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'app_bd2:editar_reparacao' restauro.id_restauro %}">
+                {% csrf_token %}
+
+                <!-- Cliente -->
+                <div class="form-group mt-3">
+                    <label for="cliente_id">Cliente</label>
+                    <select class="form-control" id="cliente_id" name="cliente_id" readonly>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if cliente.id == restauro.cliente_id %}selected{% endif %}>
+                            Nome: {{ cliente.nome }}, Nif: {{ cliente.nif }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Veículo -->
+                <div class="form-group mt-3">
+                    <label for="veiculo_id">Veículo</label>
+                    <select class="form-control" id="veiculo_id" name="veiculo_id" required>
+                        <option value="">Selecione um veículo</option>
+                        {% for veiculo in veiculos %}
+                            <option value="{{ veiculo.id_veiculo }}" {% if veiculo.id_veiculo == restauro.veiculo_id %}selected{% endif %}>
+                                Matricula: {{ veiculo.matricula }}, Cor: {{ veiculo.cor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="mao_de_obra">Mão de Obra</label>
+                    <div id="mao_de_obra">
+                        <div class="form-group mt-3">
+                            <label for="mao_de_obra">Mão de Obra</label>
+                            <div id="mao_de_obra">
+                                {% for mao in mao_de_obras %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="mao_de_obra" value="{{ mao.id }}" id="mao_obra_{{ mao.id }}"
+                                            {% for restauro_mao in restauro.mao_de_obras %}
+                                                {% if restauro_mao.id == mao.id %}
+                                                    {% if restauro_mao.id %}checked{% endif %}
+                                                    {% if restauro_mao.estado %}readonly disabled{% endif %}
+                                                {% endif %}
+                                            {% endfor %}>
+                                        <label class="form-check-label" for="mao_obra_{{ mao.id }}">
+                                            {{ mao.nome }} (<b>Valor: </b>{{ mao.valor }})
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success mt-4">Atualizar Restauro</button>
+                <a href="{% url 'app_bd2:ver_reparacao' restauro.id_restauro %}" class="btn btn-secondary mt-4">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,7 +11,9 @@ import json
 from django.core.paginator import Paginator
 from django.contrib import messages
 import json
+from django.http import JsonResponse
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 client = MongoClient('localhost', 27017)
 db = client['BD2'] 
@@ -114,6 +116,19 @@ def ver_cliente(request, id):
             return redirect('app_bd2:clientes')
 
     return render(request, 'clientes/ver_cliente.html', {'cliente': cliente, 'page_title': 'Ver Cliente'})
+
+def get_clientes():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT usuarios.id_usuarios, usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel
+            FROM usuarios
+            JOIN auth_user ON usuarios.id_usuarios = auth_user.id
+            JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
+            JOIN auth_group ON auth_user_groups.group_id = auth_group.id
+            WHERE auth_group.name = 'Cliente'
+        """)
+        rows = cursor.fetchall()
+        return [{'id': row[0], 'nome': row[1], 'nif': row[2], 'email': row[3], 'telemovel': row[4]} for row in rows]
 
 # ------------------------ ENCARREGADOS -------------------------- #
 
@@ -428,7 +443,6 @@ def cliente_listar_faturas(request):
         else:
             faturas_com_matriculas = []
 
-    mongo_client.close()
 
     return render(request, 'template_cliente/listar_faturas.html', {
         'faturas': faturas_com_matriculas
@@ -595,6 +609,16 @@ def deletar_mao_de_obra(request, id_mao_de_obra):
         messages.success(request, 'Mão de obra deletada com sucesso.')
         return redirect('app_bd2:lista_MaoDeObra')
     return render(request, 'mao_de_obra/confirmar_deletar.html', {'mao_de_obra': mao_de_obra})
+
+def get_all_mao_de_obra():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_mao_de_obra, nome, valor
+            FROM mao_de_obra
+        """)
+        rows = cursor.fetchall()
+        return [{'id': row[0], 'nome': row[1], 'valor': row[2]} for row in rows]
+  
 
 #--------------------- VEICULOS  --------------------------#
 
@@ -834,16 +858,10 @@ def eliminar_veiculo(request, id_veiculo):
     # Se o método não for POST, redireciona para a página do veículo
     return redirect('app_bd2:ver_veiculo', id_veiculo=id_veiculo)
 
-#--------------------- REPARACOES  --------------------------#
-
-def reparacoes(request):
-    return render(request, 'reparacoes/lista_reparacoes.html')
+#--------------------- ENCARREGADO REPARAÇÕES  --------------------------#
 
 @login_required
 def listar_encarregado_reparacoes(request, id_encarregado):
-    mongo_client = MongoClient("mongodb://localhost:27017/")
-    mongo_db = mongo_client["BD2"]
-    veiculos_collection = mongo_db["veiculos"]
 
     with connection.cursor() as cursor:
         cursor.execute("""
@@ -881,7 +899,7 @@ def listar_encarregado_reparacoes(request, id_encarregado):
             'matricula': matricula
         })
 
-    mongo_client.close()
+
 
     return render(request, 'template_trabalhador/listar_reparacoes.html', {
         'reparacoes': reparacoes_com_matriculas
@@ -889,12 +907,9 @@ def listar_encarregado_reparacoes(request, id_encarregado):
 
 @login_required
 def listar_encarregado_logado_reparacoes(request):
+
     id_logado = request.user.id
-
-    mongo_client = MongoClient("mongodb://localhost:27017/")
-    mongo_db = mongo_client["BD2"]
-    veiculos_collection = mongo_db["veiculos"]
-
+    print(id_logado)
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT id_usuarios
@@ -920,7 +935,7 @@ def listar_encarregado_logado_reparacoes(request):
                 INNER JOIN veiculo v ON e.id_veiculo = v.id_veiculo
                 INNER JOIN mao_restauro mr ON r.id_restauro = mr.id_restauro
                 INNER JOIN mao_de_obra m ON mr.id_mao_de_obra = m.id_mao_de_obra
-                WHERE m.id_usuarios = %s
+                WHERE mr.estado = false AND m.id_usuarios = %s
                 ORDER BY e.data DESC
             """, [id_usuarios])
 
@@ -945,23 +960,124 @@ def listar_encarregado_logado_reparacoes(request):
         else:
             reparacoes_com_matriculas = []
 
-    mongo_client.close()
 
     return render(request, 'template_trabalhador/listar_reparacoes.html', {
         'reparacoes': reparacoes_com_matriculas
     })
 
+@login_required
+def encarregado_concluir_reparacao(request, id_restauro):
+    id_logado = request.user.id
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_usuarios
+            FROM usuarios
+            WHERE user_id = %s
+        """, [id_logado])
+        id_usuarios = cursor.fetchone()
+    print(id_usuarios, id_restauro)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT concluir_restauro(%s, %s);", [id_usuarios, id_restauro])
+
+    return redirect('app_bd2:listar_encarregado_logado_reparacoes')
 
 
+#---------------------  ADMIN REPARAÇÕES  --------------------------#
+@csrf_exempt
+def get_veiculos_por_cliente(request):
+    if request.method == 'GET':
+        cliente_id = request.GET.get('cliente_id')  # Obtendo cliente_id da query string
 
-############# REPARAÇÕES          #################
+        if cliente_id:
+            try:
+                veiculos = fetch_veiculos_por_cliente(cliente_id)
+                return JsonResponse(veiculos, safe=False)
+            except Exception as e:
+                print(f"Erro ao buscar veículos: {e}")
+                return JsonResponse({'error': 'Erro ao buscar veículos'}, status=500)
+        else:
+            return JsonResponse({'error': 'Cliente ID não fornecido'}, status=400)
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
+    
+def fetch_veiculos_por_cliente(cliente_id):
+    # Passo 1: Buscar IDs dos veículos no PostgreSQL
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_veiculo
+            FROM veiculo
+            WHERE id_usuarios = %s
+        """, [cliente_id])
+        rows = cursor.fetchall()
+        veiculo_ids = [row[0] for row in rows]
+       
+    # Passo 2: Buscar detalhes dos veículos no MongoDB
+    veiculos = []
+    for veiculo_id in veiculo_ids:
+        if veiculo_id:
+            # Buscar os veículos na coleção MongoDB usando os IDs obtidos
+            mongo_veiculo = veiculos_collection.find_one({'pg_veiculo': veiculo_id})
+            veiculos.append({
+                    'id_veiculo':veiculo_id,
+                    'matricula': mongo_veiculo.get('matricula', ''),
+                    'cor': mongo_veiculo.get('cor', '')
+                })
 
+    return veiculos
+    
+@csrf_exempt
+def admin_criar_restauro(request):
+    if request.method == 'POST':
+        cliente_id = request.POST.get('cliente_id')
+        veiculo_id = request.POST.get('veiculo_id')
+        mao_de_obras_ids = request.POST.getlist('mao_de_obra')
+        
+        # Verifique se os valores são válidos
+        if not cliente_id or not veiculo_id or not mao_de_obras_ids:
+            return render(request, 'reparacoes/adicionar_reparacao.html', {
+                'clientes': get_clientes(),
+                'veiculos': get_veiculos_por_cliente(cliente_id) if cliente_id else [],
+                'mao_de_obras': get_all_mao_de_obra(),
+                'error': 'Todos os campos são obrigatórios.'
+            })
+
+        try:
+            print("VEICULO ID:",veiculo_id)
+            # Converta veiculo_id e mao_de_obras_ids para os tipos corretos
+            veiculo_id = int(veiculo_id)
+            mao_de_obras_ids = [int(id) for id in mao_de_obras_ids]
+
+            # Criação do Restauro e obtenção do ID do Restauro
+            restauro_id = criar_restauro(veiculo_id, mao_de_obras_ids)
+
+            return redirect('app_bd2:listar_reparacoes')
+        except Exception as e:
+            print(f"Erro ao criar o restauro: {e}")
+            return render(request, 'reparacoes/adicionar_reparacao.html', {
+                'clientes': get_clientes(),
+                'veiculos': get_veiculos_por_cliente(cliente_id) if cliente_id else [],
+                'mao_de_obras': get_all_mao_de_obra(),
+                'error': 'Ocorreu um erro ao criar o restauro.'
+            })
+
+    elif request.method == 'GET':
+        context = {
+            'clientes': get_clientes(),
+            'mao_de_obras': get_all_mao_de_obra()
+        }
+        return render(request, 'reparacoes/adicionar_reparacao.html', context)
+
+def criar_restauro(veiculo_id, mao_de_obras_ids):
+    with connection.cursor() as cursor:
+        # Chamada da função PostgreSQL
+        cursor.callproc('criar_restauro', [veiculo_id, mao_de_obras_ids])
+        restauro_id = cursor.fetchone()[0]
+        return restauro_id
+    
 def listar_reparacoes(request):
     reparacoes = []
-
     try:
         with connection.cursor() as cursor:
-            # Consulta SQL para obter id_restauro, id_veiculo, e data_entrada
+            # Consulta SQL para obter reparações que ainda não foram registradas na tabela saida
             cursor.execute("""
                 SELECT
                     restauro.id_restauro,
@@ -969,23 +1085,22 @@ def listar_reparacoes(request):
                     entrada.data AS data_entrada
                 FROM restauro
                 JOIN entrada ON restauro.id_entrada = entrada.id_entrada
+                LEFT JOIN saida ON restauro.id_restauro = saida.id_restauro
+                WHERE saida.id_restauro IS NULL
             """)
             resultados = cursor.fetchall()
-            print("Resultados da consulta SQL:", resultados)  # Log para depuração
 
             # Buscar todos os veículos no MongoDB para criar um dicionário id_veiculo -> matrícula
-            collection = db['veiculos']
-            mongo_veiculos = collection.find()
+            mongo_veiculos = veiculos_collection.find()
 
             # Mapear o pg_veiculo (id_veiculo do PostgreSQL) para a matrícula
             matriculas = {v.get('pg_veiculo'): v.get('matricula', 'Não disponível') for v in mongo_veiculos}
-            print("Dados do MongoDB:", matriculas)  # Log para depuração
 
             # Processar os resultados e mapear as matrículas
             for row in resultados:
                 id_restauro = row[0]
-                id_veiculo = row[1]
-                matricula = matriculas.get(id_veiculo, 'Não disponível')  # Obter matrícula do dicionário
+                pg_veiculo = row[1]
+                matricula = matriculas.get(pg_veiculo, 'Não disponível')  # Obter matrícula do dicionário
                 reparacoes.append({
                     'id_restauro': id_restauro,
                     'matricula': matricula,
@@ -995,24 +1110,20 @@ def listar_reparacoes(request):
 
                 # Consultar as tarefas associadas à reparação
                 cursor.execute("""
-                    SELECT mao_de_obra.nome
+                    SELECT mao_de_obra.nome, mao_restauro.estado
                     FROM mao_restauro
                     JOIN mao_de_obra ON mao_restauro.id_mao_de_obra = mao_de_obra.id_mao_de_obra
                     WHERE mao_restauro.id_restauro = %s
                 """, [id_restauro])
                 tarefas = cursor.fetchall()
 
-                reparacoes[-1]['tarefas'] = [tarefa[0] for tarefa in tarefas]
+                # Adicionar tarefas ao dicionário de reparações
+                reparacoes[-1]['tarefas'] = [{'nome': tarefa[0], 'estado': 'Completa' if tarefa[1] else 'Incompleta'} for tarefa in tarefas]
 
     except Exception as e:
         print("Erro ao consultar o banco de dados:", e)
 
-    print("Dados enviados para o template:", reparacoes)  # Log para depuração
-
     return render(request, 'reparacoes/lista_reparacoes.html', {'reparacoes': reparacoes, 'page_title': 'Lista de Restaurações'})
-
-
-##############  VER DADOS REPARACOES   #############
 
 def ver_reparacao(request, id):
     try:
@@ -1022,8 +1133,7 @@ def ver_reparacao(request, id):
                 SELECT
                     restauro.id_restauro,
                     entrada.id_veiculo,
-                    entrada.data AS data_entrada,
-                    restauro.valor_restauro
+                    entrada.data AS data_entrada
                 FROM restauro
                 JOIN entrada ON restauro.id_entrada = entrada.id_entrada
                 WHERE restauro.id_restauro = %s
@@ -1034,17 +1144,31 @@ def ver_reparacao(request, id):
                 id_restauro = resultado[0]
                 id_veiculo = resultado[1]
                 data_entrada = resultado[2]
-                valor_restauro = resultado[3]
 
-                # Buscar tarefas associadas à reparação
+                                # Buscar tarefas associadas à reparação
                 cursor.execute("""
-                    SELECT mao_de_obra.nome
-                    FROM mao_restauro
-                    JOIN mao_de_obra ON mao_restauro.id_mao_de_obra = mao_de_obra.id_mao_de_obra
-                    WHERE mao_restauro.id_restauro = %s
-                """, [id])
+                    SELECT 
+                        mao_de_obra.nome,
+                        mao_restauro.estado,
+                        mao_de_obra.valor
+                    FROM 
+                        mao_restauro
+                    JOIN 
+                        mao_de_obra 
+                    ON 
+                        mao_restauro.id_mao_de_obra = mao_de_obra.id_mao_de_obra
+                    WHERE 
+                        mao_restauro.id_restauro = %s
+                """, [id_restauro])
                 tarefas = cursor.fetchall()
-
+                tarefas_info = []
+                for tarefa in tarefas:
+                    nome, estado, valor = tarefa
+                    tarefas_info.append({
+                        'nome': nome,
+                        'valor': valor,
+                        'estado': 'Completa' if estado else 'Incompleta'
+                    })
                 # Buscar matrícula no MongoDB
                 collection = db['veiculos']
                 mongo_veiculo = collection.find_one({'pg_veiculo': id_veiculo})
@@ -1054,8 +1178,7 @@ def ver_reparacao(request, id):
                     'id_restauro': id_restauro,
                     'matricula': matricula,
                     'data_entrada': data_entrada,
-                    'valor_restauro': valor_restauro,
-                    'tarefas': [tarefa[0] for tarefa in tarefas]
+                    'tarefas': tarefas_info,
                 }
             else:
                 contexto = {'error': 'Restauração não encontrada'}
@@ -1065,3 +1188,121 @@ def ver_reparacao(request, id):
         contexto = {'error': 'Erro ao recuperar dados'}
 
     return render(request, 'reparacoes/ver_reparacoes.html', contexto)
+
+def buscar_restauro_por_id(id_restauro):
+    # Passo 1: Buscar informações do restauro
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT r.id_restauro, e.id_veiculo, v.id_usuarios, e.data
+            FROM restauro r
+            JOIN entrada e ON e.id_entrada = r.id_entrada
+            JOIN veiculo v ON v.id_veiculo = e.id_veiculo
+            WHERE r.id_restauro = %s
+        """, [id_restauro])
+        restauro = cursor.fetchone()
+    
+    if not restauro:
+        return None  # Retorna None se o restauro não for encontrado
+    
+    # Buscar as mãos de obra associadas
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_mao_de_obra, estado
+            FROM mao_restauro
+            WHERE id_restauro = %s
+        """, [id_restauro])
+        mao_de_obras = cursor.fetchall()
+
+    # Criar uma lista de dicionários com o ID, nome, valor e estado
+    mao_de_obras_list = [{'id': row[0], 'estado': row[1]} for row in mao_de_obras]
+
+    return {
+        'id_restauro': restauro[0],
+        'veiculo_id': restauro[1],
+        'cliente_id': restauro[2],
+        'data_entrada': restauro[3],
+        'mao_de_obras': mao_de_obras_list  # Lista de dicionários
+    }
+
+def editar_reparacao(request, id_restauro):
+    restauro = buscar_restauro_por_id(id_restauro)
+    
+    mao_de_obras_disponiveis = get_all_mao_de_obra()
+    
+    mao_de_obras_estado_dict = {mao['id']: mao['estado'] for mao in restauro['mao_de_obras']}
+    
+    mao_de_obras = [
+        {
+            'id': mao['id'],
+            'nome': mao['nome'],
+            'valor': mao['valor'],
+            'estado': mao_de_obras_estado_dict.get(mao['id'], False)  # Padrão False se não encontrar o ID
+        }
+        for mao in mao_de_obras_disponiveis
+    ]
+
+    if request.method == 'POST':
+        cliente_id = request.POST.get('cliente_id')
+        veiculo_id = request.POST.get('veiculo_id')
+        mao_de_obras_ids = request.POST.getlist('mao_de_obra')
+
+        if not cliente_id or not veiculo_id or not mao_de_obras_ids:
+            return render(request, 'reparacoes/editar_reparacao.html', {
+                'restauro': restauro,
+                'clientes': get_clientes(),
+                'veiculos': fetch_veiculos_por_cliente(cliente_id) if cliente_id else [],
+                'mao_de_obras': get_all_mao_de_obra(),
+                'error': 'Todos os campos são obrigatórios.'
+            })
+        
+        try:
+            veiculo_id = int(veiculo_id)
+            mao_de_obras_ids = [int(id) for id in mao_de_obras_ids]
+            print("CHEGEUEI AQUI")
+            # Chama a função do PostgreSQL para editar o restauro
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT editar_restauro(%s, %s, %s);",
+                    [id_restauro, veiculo_id, mao_de_obras_ids]
+                )
+
+            return redirect('app_bd2:listar_reparacoes')
+        except Exception as e:
+            print(f"Erro ao atualizar o restauro: {e}")
+            return render(request, 'reparacoes/editar_reparacao.html', {
+                'restauro': restauro,
+                'clientes': get_clientes(),
+                'veiculos': fetch_veiculos_por_cliente(cliente_id) if cliente_id else [],
+                'mao_de_obras': get_all_mao_de_obra(),
+                'error': 'Ocorreu um erro ao atualizar o restauro.'
+            })
+        
+    elif request.method == 'GET':
+        cliente_id = restauro['cliente_id']
+        context = {
+            'restauro': restauro,
+            'clientes': get_clientes(),
+            'veiculos': fetch_veiculos_por_cliente(cliente_id),
+            'mao_de_obras': mao_de_obras,
+        }
+        return render(request, 'reparacoes/editar_reparacao.html', context)
+
+def eliminar_reparacao(request,id):
+    return render(request, 'reparacoes/ver_reparacoes.html')
+
+
+
+def eliminar_reparacao(request, id_restauro):
+    if request.method == "POST":
+            with connection.cursor() as cursor:
+                # Executa a função no PostgreSQL
+                cursor.execute("SELECT excluir_restauro(%s)", [id_restauro])
+                result = cursor.fetchone()[0]  # Captura a mensagem de retorno da função
+                if "sucesso" in result.lower():
+                    messages.error(request, 'O restauro foi excluido com sucesso')
+                    return redirect('app_bd2:listar_reparacoes')
+                else:
+                    messages.error(request, 'O Restauro não pode ser excluído pois já tem tarefas concluídas.')
+                    return redirect('app_bd2:listar_reparacoes')
+                # Redireciona para a lista de restaurações com a mensagem no contexto
+    return redirect('app_bd2:listar_reparacoes')
