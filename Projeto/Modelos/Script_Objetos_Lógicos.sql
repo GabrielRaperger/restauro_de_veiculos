@@ -245,7 +245,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;~
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_verificar_reparacao_completa
 AFTER INSERT OR UPDATE ON mao_restauro
