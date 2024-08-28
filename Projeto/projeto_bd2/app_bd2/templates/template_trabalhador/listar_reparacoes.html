@@ -17,8 +17,9 @@
                 <th onclick="sortTable(1)">Data de Entrada <i class="fas fa-sort" id="sortIcon1"></i></th>
                 <th onclick="sortTable(2)">Tarefas <i class="fas fa-sort" id="sortIcon2"></i></th>
                 <th onclick="sortTable(3)">Matricula <i class="fas fa-sort" id="sortIcon3"></i></th>
-
+                {% if request.user.groups.all.0.name != "Administrador" %}
                 <th>Ações</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -27,7 +28,8 @@
                 <td>{{ reparacao.id_restauro }}</td>
                 <td>{{ reparacao.data_entrada }}</td>
                 <td>{{ reparacao.mao_de_obra_nome }}</td>
-                <td>{{ reparacao.matricula }}</td>~
+                <td>{{ reparacao.matricula }}</td>
+                {% if request.user.groups.all.0.name != "Administrador" %}
                 <td>
                     <form method="post" action="{% url 'app_bd2:encarregado_concluir_reparacao' id_restauro=reparacao.id_restauro %}" style="display:inline;">
                         {% csrf_token %}
@@ -36,6 +38,7 @@
                         </button>
                     </form>
                 </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>

@@ -120,12 +120,12 @@ def ver_cliente(request, id):
 def get_clientes():
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT usuarios.id_usuarios, usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel
+            SELECT usuarios.id_usuarios, usuarios.nome, usuarios.nif, usuarios.email, usuarios.telemovel, usuarios.user_id
             FROM usuarios
             JOIN auth_user ON usuarios.id_usuarios = auth_user.id
             JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
             JOIN auth_group ON auth_user_groups.group_id = auth_group.id
-            WHERE auth_group.name = 'Cliente' AND usuarios.id_usuarios <> 21
+            WHERE auth_group.name = 'Cliente'
         """)
         rows = cursor.fetchall()
         return [{'id': row[0], 'nome': row[1], 'nif': row[2], 'email': row[3], 'telemovel': row[4]} for row in rows]
@@ -1073,6 +1073,7 @@ def criar_restauro(veiculo_id, mao_de_obras_ids):
         restauro_id = cursor.fetchone()[0]
         return restauro_id
     
+@login_required
 def listar_reparacoes(request):
     reparacoes = []
     try:
