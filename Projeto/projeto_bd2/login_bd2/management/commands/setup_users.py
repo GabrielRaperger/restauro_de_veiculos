@@ -36,9 +36,7 @@ class Command(BaseCommand):
             admin_group = Group.objects.get(name='Administrador')
             admin_user.groups.add(admin_group)
 
-            next_id_usuarios = 21
-            self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address', next_id_usuarios)
-            next_id_usuarios += 1  
+            self._create_usuario_entry(admin_user, 'Admin User', '999999999', '123456789', 'Admin Address', 21)
             self.stdout.write(self.style.SUCCESS('Superuser criado com sucesso'))
         else:
             self.stdout.write(self.style.WARNING('Superuser já existe'))

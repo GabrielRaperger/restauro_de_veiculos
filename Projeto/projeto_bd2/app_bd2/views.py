@@ -125,7 +125,7 @@ def get_clientes():
             JOIN auth_user ON usuarios.id_usuarios = auth_user.id
             JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
             JOIN auth_group ON auth_user_groups.group_id = auth_group.id
-            WHERE auth_group.name = 'Cliente'
+            WHERE auth_group.name = 'Cliente' AND usuarios.id_usuarios <> 21
         """)
         rows = cursor.fetchall()
         return [{'id': row[0], 'nome': row[1], 'nif': row[2], 'email': row[3], 'telemovel': row[4]} for row in rows]
