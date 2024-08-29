@@ -19,7 +19,7 @@ urlpatterns = [
     path('encarregados/<int:id>/ver_encarregado/', views.ver_encarregado, name='ver_encarregado'),
     path('encarregados/<int:id_encarregado>/lista_reparacoes/', views.listar_encarregado_reparacoes, name='listar_encarregado_reparacoes'),
     path('encarregados/listar_encarregado_logado_reparacoes/', views.listar_encarregado_logado_reparacoes, name='listar_encarregado_logado_reparacoes'),
-    path('encarregados/encarregado_concluir_reparacao/<int:id_restauro>/', views.encarregado_concluir_reparacao, name='encarregado_concluir_reparacao'),
+    path('encarregados/encarregado_concluir_reparacao/<int:id_restauro>/<int:mao_de_obra_id>/', views.encarregado_concluir_reparacao, name='encarregado_concluir_reparacao'),
    
     # ---------- FATURAS ----------------- #
     path('faturas/', lista_faturas, name='lista_faturas'),

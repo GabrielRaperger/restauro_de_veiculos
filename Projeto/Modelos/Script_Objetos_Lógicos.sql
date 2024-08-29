@@ -147,21 +147,22 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION concluir_restauro(usuario_id INTEGER, restauro_id INTEGER)
+CREATE OR REPLACE FUNCTION concluir_restauro(usuario_id INTEGER, restauro_id INTEGER, mao_de_obra_id INTEGER)
 RETURNS VOID AS $$
 BEGIN
- 
+    -- Atualiza o estado da mão de obra apenas se corresponder ao restauro e id_mao_de_obra fornecidos
     UPDATE mao_restauro
     SET estado = TRUE
-    WHERE id_mao_de_obra IN (
+    WHERE id_mao_de_obra = mao_de_obra_id
+    AND id_restauro = restauro_id
+    AND id_mao_de_obra IN (
         SELECT id_mao_de_obra
         FROM mao_de_obra
         WHERE id_usuarios = usuario_id
-    )
-    AND id_restauro = restauro_id;
-
+    );
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE PROCEDURE proc_inserir_encarregado(
     p_username VARCHAR,

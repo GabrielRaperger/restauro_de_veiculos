@@ -944,7 +944,6 @@ def listar_encarregado_reparacoes(request, id_encarregado):
 def listar_encarregado_logado_reparacoes(request):
 
     id_logado = request.user.id
-    print(id_logado)
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT id_usuarios
@@ -964,6 +963,7 @@ def listar_encarregado_logado_reparacoes(request):
                     r.id_restauro,
                     e.data AS data_entrada,
                     m.nome AS mao_de_obra_nome,
+                    m.id_mao_de_obra AS mao_de_obra_id,
                     v.id_veiculo
                 FROM restauro r
                 INNER JOIN entrada e ON r.id_entrada = e.id_entrada
@@ -981,7 +981,8 @@ def listar_encarregado_logado_reparacoes(request):
                 id_restauro = reparacao[0]
                 data_entrada = reparacao[1]
                 mao_de_obra_nome = reparacao[2]
-                id_veiculo = reparacao[3]
+                mao_de_obra_id = reparacao[3]
+                id_veiculo = reparacao[4]
 
                 veiculo = veiculos_collection.find_one({"pg_veiculo": id_veiculo})
                 matricula = veiculo["matricula"] if veiculo else "Matrícula não encontrada"
@@ -990,6 +991,7 @@ def listar_encarregado_logado_reparacoes(request):
                     'id_restauro': id_restauro,
                     'data_entrada': data_entrada,
                     'mao_de_obra_nome': mao_de_obra_nome,
+                    'mao_de_obra_id': mao_de_obra_id,
                     'matricula': matricula
                 })
         else:
@@ -1001,7 +1003,7 @@ def listar_encarregado_logado_reparacoes(request):
     })
 
 @login_required
-def encarregado_concluir_reparacao(request, id_restauro):
+def encarregado_concluir_reparacao(request, id_restauro, mao_de_obra_id):
     id_logado = request.user.id
     with connection.cursor() as cursor:
         cursor.execute("""
@@ -1010,9 +1012,9 @@ def encarregado_concluir_reparacao(request, id_restauro):
             WHERE user_id = %s
         """, [id_logado])
         id_usuarios = cursor.fetchone()
-    print(id_usuarios, id_restauro)
+    print(id_usuarios, mao_de_obra_id,id_restauro )
     with connection.cursor() as cursor:
-        cursor.execute("SELECT concluir_restauro(%s, %s);", [id_usuarios, id_restauro])
+        cursor.execute("SELECT concluir_restauro(%s, %s, %s);", [id_usuarios, id_restauro, mao_de_obra_id])
 
     return redirect('app_bd2:listar_encarregado_logado_reparacoes')
 

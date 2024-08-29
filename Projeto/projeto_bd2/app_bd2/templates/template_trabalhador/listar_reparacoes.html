@@ -6,6 +6,9 @@
 <div class="clientes-table-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Lista de Reparações</h2>
+        <a href="{% url 'app_bd2:encarregados' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
     </div>
 
     <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por nome">
@@ -29,16 +32,16 @@
                 <td>{{ reparacao.data_entrada }}</td>
                 <td>{{ reparacao.mao_de_obra_nome }}</td>
                 <td>{{ reparacao.matricula }}</td>
-                {% if request.user.groups.all.0.name != "Administrador" %}
                 <td>
-                    <form method="post" action="{% url 'app_bd2:encarregado_concluir_reparacao' id_restauro=reparacao.id_restauro %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success" onclick="return confirm('Tem certeza de que deseja concluir o trabalho nesse veiculo?');">
-                            <i class="fas fa-check"></i> Concluir
-                        </button>
-                    </form>
-                </td>
+                {% if request.user.groups.all.0.name != "Administrador" %}
+                        <form method="post" action="{% url 'app_bd2:encarregado_concluir_reparacao' reparacao.id_restauro reparacao.mao_de_obra_id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Tem certeza de que deseja concluir o trabalho nesse veiculo?');">
+                                <i class="fas fa-check"></i> Concluir
+                            </button>
+                        </form>
                 {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
