@@ -48,9 +48,16 @@
             <td>{{ fatura.valor_total }}</td>
         </tr>
     </table>
+    {% if request.user.groups.all.0.name == "Administrador" %}
+        <div class="text-center mt-4">
+            <a href="{% url 'app_bd2:lista_faturas' %}" class="btn btn-danger">Voltar à Lista</a>
+        </div>
+    {% endif %}
+    {% if request.user.groups.all.0.name == "Cliente" %}
     <div class="text-center mt-4">
-        <a href="{% url 'app_bd2:lista_faturas' %}" class="btn btn-danger">Voltar à Lista</a>
+        <a href="{% url 'app_bd2:cliente_listar_faturas' %}" class="btn btn-danger">Voltar à Lista</a>
     </div>
+    {% endif %}
 </div>
 <style>
     .indent-list {

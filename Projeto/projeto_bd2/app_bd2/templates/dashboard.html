@@ -1,8 +1,86 @@
 {% extends "menu.html" %}
 
-{% block title %}Home - Minha Aplicação{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-    <h1>Bem-vindo à Página Inicial!</h1>
-    <p>Conteúdo específico da página inicial.</p>
+{% if request.user.groups.all.0.name == "Administrador" %}
+    <div class="container mt-5">
+        <div class="row text-center">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary">Clientes</h2>
+                        <p class="display-4 text-primary font-weight-bold">{{ total_clientes }}</p>
+                        <a href="{% url 'app_bd2:clientes' %}" class="btn btn-primary mt-3">Ver Clientes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-success">Encarregados</h2>
+                        <p class="display-4 text-success font-weight-bold">{{ total_encarregados }}</p>
+                        <a href="{% url 'app_bd2:encarregados' %}" class="btn btn-success mt-3">Ver Encarregados</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-warning">Reparações</h2>
+                        <p class="display-4 text-warning font-weight-bold">{{ total_reparacoes }}</p>
+                        <a href="{% url 'app_bd2:listar_reparacoes' %}" class="btn btn-warning mt-3">Ver Reparações</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-danger">Faturas</h2>
+                        <p class="display-4 text-danger font-weight-bold">{{ total_faturas }}</p>
+                        <a href="{% url 'app_bd2:lista_faturas' %}" class="btn btn-danger mt-3">Ver Faturas</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Novo campo para o número de veículos -->
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        <h2 class="card-title text-info">Veículos</h2>
+                        <p class="display-4 text-info font-weight-bold">{{ total_veiculos }}</p>
+                        <a href="{% url 'app_bd2:listar_veiculos' %}" class="btn btn-info mt-3">Ver Veículos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if request.user.groups.all.0.name == "Cliente" %}
+        <div class="row text-center">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-danger">Faturas</h2>
+                        <p class="display-4 text-danger font-weight-bold">{{ total_faturas_por_cliente }}</p>
+                        <a href="{% url 'app_bd2:cliente_listar_faturas' %}" class="btn btn-danger mt-3">Ver Faturas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Menu para Trabalhador -->
+    {% if request.user.groups.all.0.name == "Trabalhador" %}
+    <div class="row text-center">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title text-warning">Reparações</h2>
+                    <p class="display-4 text-warning font-weight-bold">{{ total_restauros_por_usuario }}</p>
+                    <a href="{% url 'app_bd2:listar_encarregado_logado_reparacoes' %}" class="btn btn-warning mt-3">Ver Reparações</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

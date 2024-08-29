@@ -464,6 +464,108 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-------------------------------- CONTAR DADOS DASHBOARD ------------------------------------
+
+CREATE OR REPLACE FUNCTION contar_faturas() 
+RETURNS INTEGER AS $$
+DECLARE
+    total_faturas INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO total_faturas FROM faturas;
+    RETURN total_faturas;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION contar_reparacoes()
+RETURNS INTEGER AS $$
+DECLARE
+    total_reparacoes INTEGER;
+BEGIN
+    -- Contar reparações que não têm uma saída associada
+    SELECT COUNT(*) INTO total_reparacoes
+    FROM restauro
+    LEFT JOIN saida ON restauro.id_restauro = saida.id_restauro
+    WHERE saida.id_restauro IS NULL;
+    RETURN total_reparacoes;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION contar_clientes()
+RETURNS INTEGER AS $$
+DECLARE
+    total_clientes INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO total_clientes
+    FROM usuarios
+    JOIN auth_user ON usuarios.id_usuarios = auth_user.id
+    JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
+    JOIN auth_group ON auth_user_groups.group_id = auth_group.id
+    WHERE auth_group.name = 'Cliente';
+    RETURN total_clientes;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION contar_encarregados()
+RETURNS INTEGER AS $$
+DECLARE
+    total_encarregados INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO total_encarregados
+    FROM usuarios
+    JOIN auth_user ON usuarios.id_usuarios = auth_user.id
+    JOIN auth_user_groups ON auth_user.id = auth_user_groups.user_id
+    JOIN auth_group ON auth_user_groups.group_id = auth_group.id
+    WHERE auth_group.name = 'Trabalhador';
+    RETURN total_encarregados;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION contar_veiculos()
+RETURNS INTEGER AS $$
+DECLARE
+    total_veiculos INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO total_veiculos FROM veiculo;
+    RETURN total_veiculos;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION contar_faturas_por_cliente(cliente_id INTEGER)
+RETURNS INTEGER AS $$
+DECLARE
+    total_faturas INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO total_faturas
+    FROM faturas
+    WHERE id_usuarios = cliente_id;
+    RETURN total_faturas;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION contar_restauros_por_usuario(usuario_id INTEGER)
+RETURNS INTEGER AS $$
+DECLARE
+    total_restauros INTEGER;
+BEGIN
+    -- Conta o número de restauros associados ao id_usuarios fornecido
+    -- que não estão na tabela saida e onde o estado é false
+    SELECT COUNT(*)
+    INTO total_restauros
+    FROM restauro
+    JOIN mao_restauro ON restauro.id_restauro = mao_restauro.id_restauro
+    JOIN mao_de_obra ON mao_restauro.id_mao_de_obra = mao_de_obra.id_mao_de_obra
+    LEFT JOIN saida ON restauro.id_restauro = saida.id_restauro
+    WHERE mao_de_obra.id_usuarios = usuario_id
+    AND saida.id_restauro IS NULL
+    AND mao_restauro.estado = FALSE;
+
+    -- Retorna o total encontrado
+    RETURN total_restauros;
+END;
+$$ LANGUAGE plpgsql;
 
 -------------------------------- MAO DE OBRA ------------------------------------
 

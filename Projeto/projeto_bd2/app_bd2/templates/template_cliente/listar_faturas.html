@@ -22,15 +22,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for cliente in clientes %}
+            {% for fatura in faturas %}
             <tr>
-                <td>{{ cliente.nome }}</td>
-                <td>{{ cliente.nif }}</td>
-                <td>{{ cliente.email }}</td>
-                <td>{{ cliente.telemovel }}</td>
+                <td>{{ fatura.id_faturas }}</td>
+                <td>{{ fatura.data_emissao }}</td>
+                <td>{{ fatura.valor_total }}</td>
+                <td>{{ fatura.matricula }}</td>
                 <td>
-                    {% if cliente.id_usuarios %}
-                        <a href="{% url 'app_bd2:ver_cliente' cliente.id_usuarios %}" class="btn btn-primary btn-icon btn-view">
+                    {% if fatura.id_faturas %}
+                        <a href="{% url 'app_bd2:ver_faturas' fatura.id_faturas %}" class="btn btn-primary btn-icon btn-view">
                             <i class="fas fa-eye"></i> Ver Dados
                         </a>
                     {% endif %}

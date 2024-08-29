@@ -19,8 +19,43 @@ client = MongoClient('localhost', 27017)
 db = client['BD2'] 
 veiculos_collection = db["veiculos"]
 
+from django.db import connection
+from django.shortcuts import render
+
 def dashboard(request):
-    return render(request, 'dashboard.html', {'page_title': 'Dashboard'})
+
+    cliente_id = request.user.id
+    def execute_function(func_name, *args):
+        with connection.cursor() as cursor:
+            # Cria um placeholder para os argumentos
+            args_placeholder = ', '.join(['%s'] * len(args))
+            # Executa a função PostgreSQL com os argumentos
+            cursor.execute(f"SELECT {func_name}({args_placeholder});", args)
+            result = cursor.fetchone()
+        return result[0] if result else 0
+
+    # Chame as funções PostgreSQL
+    total_faturas = execute_function('contar_faturas')
+    total_reparacoes = execute_function('contar_reparacoes')
+    total_clientes = execute_function('contar_clientes')
+    total_encarregados = execute_function('contar_encarregados')
+    total_veiculos = execute_function('contar_veiculos')
+    total_faturas_por_cliente = execute_function('contar_faturas_por_cliente', cliente_id)
+    total_restauros_por_usuario = execute_function('contar_restauros_por_usuario', cliente_id)
+    # Renderize o template com os valores obtidos
+    context = {
+        'page_title': 'Dashboard',
+        'total_faturas': total_faturas,
+        'total_reparacoes': total_reparacoes,
+        'total_clientes': total_clientes,
+        'total_encarregados': total_encarregados,
+        'total_veiculos': total_veiculos,
+        'total_faturas_por_cliente': total_faturas_por_cliente,
+        'total_restauros_por_usuario': total_restauros_por_usuario
+    }
+    
+    return render(request, 'dashboard.html', context)
+
 
 # ------------------------ CLIENTES -------------------------- #
 
