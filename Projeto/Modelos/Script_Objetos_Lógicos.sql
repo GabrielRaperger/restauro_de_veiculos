@@ -712,25 +712,5 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--------------------- Arrumar Tabelas --------------------------
--- Ajusta a sequência para a tabela veiculo
-SELECT setval('veiculo_id_veiculo_seq', (SELECT COALESCE(MAX(id_veiculo), 0) FROM veiculo) + 1);
 
--- Ajusta a sequência para a tabela entrada
-SELECT setval('entrada_id_entrada_seq', (SELECT COALESCE(MAX(id_entrada), 0) FROM entrada) + 1);
-
--- Ajusta a sequência para a tabela restauro
-SELECT setval('restauro_id_restauro_seq', (SELECT COALESCE(MAX(id_restauro), 0) FROM restauro) + 1);
-
--- Ajusta a sequência para a tabela saida
-SELECT setval('saida_id_saida_seq', (SELECT COALESCE(MAX(id_saida), 0) FROM saida) + 1);
-
--- Ajusta a sequência para a tabela faturas
-SELECT setval('faturas_id_faturas_seq', (SELECT COALESCE(MAX(id_faturas), 0) FROM faturas) + 1);
-
--- Ajusta a sequência para a tabela mao_de_obra
-SELECT setval('mao_de_obra_id_mao_de_obra_seq', (SELECT COALESCE(MAX(id_mao_de_obra), 0) FROM mao_de_obra) + 1);
-
--- Ajusta a sequência para a tabela especialidades
-SELECT setval('especialidades_id_especialidade_seq', (SELECT COALESCE(MAX(id_especialidade), 0) FROM especialidades) + 1);
 

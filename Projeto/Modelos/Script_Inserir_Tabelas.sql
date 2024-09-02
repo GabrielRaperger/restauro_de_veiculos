@@ -23,17 +23,17 @@ VALUES
     ('Sara Costa', '990011223', '990123999', 'Rua S, 909', 'sara.costa@example.com'),
     ('Bruno Teixeira', '101122334', '991234000', 'Rua T, 010', 'bruno.teixeira@example.com');
 
-INSERT INTO marca (id_marca, nome) VALUES
-    (1, 'Toyota'),
-    (2, 'Ford'),
-    (3, 'Volkswagen'),
-    (4, 'Honda'),
-    (5, 'Chevrolet'),
-    (6, 'BMW'),
-    (7, 'Mercedes'),
-    (8, 'Seat'),
-    (9, 'Nissan'),
-    (10, 'Alfa Romeo');
+INSERT INTO marca (nome) VALUES
+    ('Toyota'),
+    ('Ford'),
+    ('Volkswagen'),
+    ('Honda'),
+    ('Chevrolet'),
+    ('BMW'),
+    ('Mercedes'),
+    ('Seat'),
+    ('Nissan'),
+    ('Alfa Romeo');
 	
 -- Inserir dados na tabela 'veiculo'
 INSERT INTO veiculo (id_marca, id_usuarios)
@@ -47,49 +47,67 @@ VALUES
     (7, 17), -- Cliente 7: Ford Mustang
     (8, 18), -- Cliente 8: Volkswagen Jetta
     (9, 19), -- Cliente 9: Honda Accord
-    (10, 20); -- Cliente 10: Chevrolet Cruze
+    (10, 20), -- Cliente 10: Chevrolet Cruze
+    (10, 11), -- Cliente 1: Toyota Corolla
+    (9, 12), -- Cliente 2: Ford Focus
+    (8, 13), -- Cliente 3: Volkswagen Golf
+    (7, 14), -- Cliente 4: Honda Civic
+    (6, 15), -- Cliente 5: Chevrolet Malibu
+    (5, 16), -- Cliente 6: Toyota Camry
+    (4, 17), -- Cliente 7: Ford Mustang
+    (3, 18), -- Cliente 8: Volkswagen Jetta
+    (2, 19), -- Cliente 9: Honda Accord
+    (1, 20); -- Cliente 10: Chevrolet Cruze
 
 -- Inserir dados na tabela 'entrada'
 INSERT INTO entrada (id_veiculo, data)
 VALUES
-    (1, '2024-08-01 10:00:00'),
-    (2, '2024-08-02 11:00:00'),
-    (3, '2024-08-03 12:00:00'),
-    (4, '2024-08-04 13:00:00'),
-    (5, '2024-08-05 14:00:00'),
-    (6, '2024-08-06 15:00:00'),
-    (7, '2024-08-07 16:00:00'),
-    (8, '2024-08-08 17:00:00'),
-    (9, '2024-08-09 18:00:00'),
-    (10, '2024-08-10 19:00:00');
+    (1, '2024-08-03 10:02:15'),
+    (2, '2024-08-07 11:13:47'),
+    (3, '2024-08-05 12:25:33'),
+    (4, '2024-08-02 13:38:56'),
+    (5, '2024-08-09 14:49:21'),
+    (6, '2024-08-01 15:08:39'),
+    (7, '2024-08-04 16:17:54'),
+    (8, '2024-08-08 17:26:43'),
+    (9, '2024-08-06 18:34:12'),
+    (10, '2024-08-10 19:45:08'),
+    (11, '2024-08-05 16:23:11'),
+    (12, '2024-08-07 17:34:29'),
+    (13, '2024-08-03 18:48:53'),
+    (14, '2024-08-02 19:57:37');
 
 -- Inserir dados na tabela 'restauro'
 INSERT INTO restauro (id_entrada)
 VALUES
     (1),  -- Restauro 1 (completo)
     (2),  -- Restauro 2 (completo)
-    (3),  -- Restauro 3 (incompleto)
+    (3),  -- Restauro 3 (completo)
     (4),  -- Restauro 4 (completo)
     (5),  -- Restauro 5 (completo)
-    (6),  -- Restauro 6 (incompleto)
+    (6),  -- Restauro 6 (completo)
     (7),  -- Restauro 7 (completo)
     (8),  -- Restauro 8 (incompleto)
     (9),  -- Restauro 9 (incompleto)
-    (10); -- Restauro 10 (incompleto)
+    (10), -- Restauro 10 (incompleto)
+    (11),  -- Restauro 11 (incompleto)
+    (12),  -- Restauro 12 (incompleto)
+    (13),  -- Restauro 13 (incompleto)
+    (14); -- Restauro 14 (incompleto)
 
 -- Inserir dados na tabela 'mao_de_obra'
 INSERT INTO mao_de_obra (id_usuarios, nome, valor)
 VALUES
-    (1, 'Troca de Óleo', 50.00),     -- Trabalhador 1
-    (2, 'Alinhamento e Balanceamento', 55.00), -- Trabalhador 2
-    (3, 'Troca de Pastilhas de Freio', 60.00), -- Trabalhador 3
-    (4, 'Substituição de Amortecedores', 65.00), -- Trabalhador 4
-    (5, 'Troca de Bateria', 70.00), -- Trabalhador 5
-    (6, 'Reparo de Transmissão', 75.00), -- Trabalhador 6
-    (7, 'Troca de Filtros', 80.00), -- Trabalhador 7
-    (8, 'Reparo de Ar Condicionado', 85.00), -- Trabalhador 8
-    (9, 'Substituição de Velas', 90.00), -- Trabalhador 9
-    (10, 'Troca de Correia Dentada', 95.00); -- Trabalhador 10
+    (1, 'Troca de Óleo', 150.75),     -- Trabalhador 1
+    (2, 'Alinhamento e Balanceamento', 155.90), -- Trabalhador 2
+    (3, 'Troca de Pastilhas de Freio', 160.45), -- Trabalhador 3
+    (4, 'Substituição de Amortecedores', 165.80), -- Trabalhador 4
+    (5, 'Troca de Bateria', 170.35), -- Trabalhador 5
+    (6, 'Reparo de Transmissão', 175.95), -- Trabalhador 6
+    (7, 'Troca de Filtros', 180.50), -- Trabalhador 7
+    (8, 'Reparo de Ar Condicionado', 185.60), -- Trabalhador 8
+    (9, 'Substituição de Velas', 190.25), -- Trabalhador 9
+    (10, 'Troca de Correia Dentada', 195.85); -- Trabalhador 10
 
 -- Inserir dados na tabela 'especialidades'
 INSERT INTO especialidades (nome) VALUES 
@@ -120,34 +138,97 @@ INSERT INTO especialidade_usuarios (id_especialidade, id_usuarios) VALUES
 -- Inserir dados na tabela 'mao_restauro'
 INSERT INTO mao_restauro (id_mao_de_obra, id_restauro, estado)
 VALUES
+    -- Restauros 1 a 7 (todos completos)
     (1, 1, TRUE),  -- Troca de Óleo, Restauro 1, Completo
-    (2, 1, FALSE), -- Alinhamento e Balanceamento, Restauro 1, Incompleto
+    (3, 1, TRUE),  -- Troca de Pastilhas de Freio, Restauro 1, Completo
+    (5, 1, TRUE),  -- Troca de Bateria, Restauro 1, Completo
+    (2, 1, TRUE),  -- Alinhamento e Balanceamento, Restauro 1, Completo
+    
+    (2, 2, TRUE),  -- Alinhamento e Balanceamento, Restauro 2, Completo
     (3, 2, TRUE),  -- Troca de Pastilhas de Freio, Restauro 2, Completo
-    (4, 3, FALSE), -- Substituição de Amortecedores, Restauro 3, Incompleto
+    (4, 2, TRUE),  -- Substituição de Amortecedores, Restauro 2, Completo
+    (5, 2, TRUE),  -- Troca de Bateria, Restauro 2, Completo
+    
+    (4, 3, TRUE),  -- Substituição de Amortecedores, Restauro 3, Completo
     (5, 3, TRUE),  -- Troca de Bateria, Restauro 3, Completo
+    (6, 3, TRUE),  -- Reparo de Transmissão, Restauro 3, Completo
+    (3, 3, TRUE),  -- Troca de Pastilhas de Freio, Restauro 3, Completo
+    
     (6, 4, TRUE),  -- Reparo de Transmissão, Restauro 4, Completo
     (7, 4, TRUE),  -- Troca de Filtros, Restauro 4, Completo
-    (8, 5, FALSE), -- Reparo de Ar Condicionado, Restauro 5, Incompleto
-    (9, 6, FALSE), -- Substituição de Velas, Restauro 6, Incompleto
-    (10, 7, TRUE), -- Troca de Correia Dentada, Restauro 7, Completo
+    (8, 4, TRUE),  -- Reparo de Ar Condicionado, Restauro 4, Completo
+    (9, 4, TRUE),  -- Substituição de Velas, Restauro 4, Completo
+    
+    (8, 5, TRUE),  -- Reparo de Ar Condicionado, Restauro 5, Completo
+    (9, 5, TRUE),  -- Substituição de Velas, Restauro 5, Completo
+    (10, 5, TRUE), -- Troca de Correia Dentada, Restauro 5, Completo
+    (7, 5, TRUE),  -- Troca de Filtros, Restauro 5, Completo
+    
+    (10, 6, TRUE), -- Troca de Correia Dentada, Restauro 6, Completo
+    (1, 6, TRUE),  -- Troca de Óleo, Restauro 6, Completo
+    (2, 6, TRUE),  -- Alinhamento e Balanceamento, Restauro 6, Completo
+    (3, 6, TRUE),  -- Troca de Pastilhas de Freio, Restauro 6, Completo
+    
+    (3, 7, TRUE),  -- Troca de Pastilhas de Freio, Restauro 7, Completo
+    (4, 7, TRUE),  -- Substituição de Amortecedores, Restauro 7, Completo
+    (5, 7, TRUE),  -- Troca de Bateria, Restauro 7, Completo
+    (6, 7, TRUE),  -- Reparo de Transmissão, Restauro 7, Completo
+
+    -- Restauros 8 a 14 (alguns com 1 completo, outros com nenhum)
     (1, 8, FALSE), -- Troca de Óleo, Restauro 8, Incompleto
-    (2, 9, FALSE), -- Alinhamento e Balanceamento, Restauro 9, Incompleto
-    (3, 10, FALSE); -- Troca de Pastilhas de Freio, Restauro 10, Incompleto
+    (2, 8, FALSE), -- Alinhamento e Balanceamento, Restauro 8, Incompleto
+    (3, 8, TRUE),  -- Troca de Pastilhas de Freio, Restauro 8, Completo
+    (4, 8, FALSE), -- Substituição de Amortecedores, Restauro 8, Incompleto
+    
+    (5, 9, FALSE), -- Troca de Bateria, Restauro 9, Incompleto
+    (6, 9, FALSE), -- Reparo de Transmissão, Restauro 9, Incompleto
+    (7, 9, TRUE),  -- Troca de Filtros, Restauro 9, Completo
+    (8, 9, FALSE), -- Reparo de Ar Condicionado, Restauro 9, Incompleto
+    
+    (9, 10, FALSE), -- Substituição de Velas, Restauro 10, Incompleto
+    (10, 10, FALSE),-- Troca de Correia Dentada, Restauro 10, Incompleto
+    (1, 10, TRUE),  -- Troca de Óleo, Restauro 10, Completo
+    (2, 10, FALSE), -- Alinhamento e Balanceamento, Restauro 10, Incompleto
+    
+    (3, 11, FALSE), -- Troca de Pastilhas de Freio, Restauro 11, Incompleto
+    (4, 11, FALSE), -- Substituição de Amortecedores, Restauro 11, Incompleto
+    (5, 11, FALSE), -- Troca de Bateria, Restauro 11, Incompleto
+    (6, 11, TRUE),  -- Reparo de Transmissão, Restauro 11, Completo
+    
+    (7, 12, FALSE), -- Troca de Filtros, Restauro 12, Incompleto
+    (8, 12, FALSE), -- Reparo de Ar Condicionado, Restauro 12, Incompleto
+    (9, 12, FALSE), -- Substituição de Velas, Restauro 12, Incompleto
+    (10, 12, FALSE),-- Troca de Correia Dentada, Restauro 12, Incompleto
+    
+    (1, 13, FALSE), -- Troca de Óleo, Restauro 13, Incompleto
+    (2, 13, FALSE), -- Alinhamento e Balanceamento, Restauro 13, Incompleto
+    (3, 13, FALSE), -- Troca de Pastilhas de Freio, Restauro 13, Incompleto
+    (4, 13, TRUE),  -- Substituição de Amortecedores, Restauro 13, Completo
+    
+    (5, 14, FALSE), -- Troca de Bateria, Restauro 14, Incompleto
+    (6, 14, FALSE), -- Reparo de Transmissão, Restauro 14, Incompleto
+    (7, 14, FALSE), -- Troca de Filtros, Restauro 14, Incompleto
+    (8, 14, FALSE); -- Reparo de Ar Condicionado, Restauro 14, Incompleto
+
 
 -- Inserir dados na tabela 'saida'
 INSERT INTO saida (id_restauro, data)
 VALUES
-    (1, '2024-08-01 20:00:00'),
-    (2, '2024-08-02 20:00:00'),
-    (4, '2024-08-04 20:00:00'),
-    (6, '2024-08-06 20:00:00'),
-    (7, '2024-08-07 20:00:00');
+    (1, '2024-08-10 12:15:45'),
+    (2, '2024-08-14 14:27:59'),
+    (3, '2024-08-12 15:45:21'),
+    (4, '2024-08-09 16:50:37'),
+    (5, '2024-08-16 18:12:43'),
+    (6, '2024-08-08 18:22:11'),
+    (7, '2024-08-11 20:30:59');
+
 
 -- Inserir dados na tabela 'faturas'
 INSERT INTO faturas (id_saida, id_usuarios, data_emissao, valor_total)
 VALUES
-    (1, 11, '2024-08-01 21:00:00', 200.00),  -- Fatura para Saída 1
-    (2, 12, '2024-08-02 21:00:00', 250.00),  -- Fatura para Saída 2
-    (3, 13, '2024-08-03 21:00:00', 300.00),  -- Fatura para Saída 4
-    (4, 14, '2024-08-04 21:00:00', 350.00),  -- Fatura para Saída 5
-    (5, 15, '2024-08-05 21:00:00', 400.00);  -- Fatura para Saída 7
+    (1, 11, '2024-08-10 21:12:34', 637.45),
+    (2, 12, '2024-08-14 22:15:45', 652.50),
+    (3, 13, '2024-08-12 23:18:56', 672.55),
+    (4, 14, '2024-08-09 20:23:11', 737.30),
+    (5, 15, '2024-08-16 22:30:29', 752.20);
+
