@@ -9,6 +9,16 @@
         <a href="{% url 'app_bd2:encarregados' %}" class="btn btn-danger">
             <i class="fas fa-arrow-left"></i> Voltar à Lista
         </a>
+        {% if request.user.groups.all.0.name == "Administrador" %}
+        <a href="{% url 'app_bd2:encarregados' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+        {% endif %}
+        {% if request.user.groups.all.0.name == "Cliente" %}
+        <a href="{% url 'app_bd2:listar_encarregado_reparacoes' %}" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+        {% endif %}
     </div>
 
     <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por nome">
