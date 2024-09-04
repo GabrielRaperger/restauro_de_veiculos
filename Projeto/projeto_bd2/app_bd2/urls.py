@@ -33,6 +33,8 @@ urlpatterns = [
     path('mao_obra/adicionar', adicionar_mao_de_obra, name='adicionar_mao_de_obra'),
     path('mao_de_obra/<int:id_mao_de_obra>/editar/', views.editar_mao_de_obra, name='editar_mao_de_obra'),
     path('mao_de_obra/<int:id_mao_de_obra>/deletar/', views.deletar_mao_de_obra, name='deletar_mao_de_obra'),
+    path('mao_de_obra/importar/', views.importar_mao_de_obra_json, name='importar_mao_de_obra_json'),
+    path('mao_de_obra/exportar/', views.exportar_mao_de_obra_json, name='exportar_mao_de_obra_json'),
 
     #------------------- VEICULOS  ----------------------#
     path('veiculos/registar/', registar_veiculo, name='registar_veiculo'),

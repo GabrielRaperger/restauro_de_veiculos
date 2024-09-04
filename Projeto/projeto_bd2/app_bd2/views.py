@@ -11,9 +11,11 @@ import json
 from django.core.paginator import Paginator
 from django.contrib import messages
 import json
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
+from django.core.serializers.json import DjangoJSONEncoder
 
 client = MongoClient('localhost', 27017)
 db = client['BD2'] 
@@ -654,6 +656,44 @@ def get_all_mao_de_obra():
         rows = cursor.fetchall()
         return [{'id': row[0], 'nome': row[1], 'valor': row[2]} for row in rows]
   
+def importar_mao_de_obra_json(request):
+    if request.method == 'POST':
+        json_file = request.FILES.get('json_file')
+        if json_file:
+            try:
+                data = json.load(json_file)
+                for item in data:
+                    id_usuario = item.get('id_usuario')
+                    nome = item.get('nome')
+                    valor = item.get('valor')
+
+                    # Usar a função PL/pgSQL para inserir os dados
+                    with connection.cursor() as cursor:
+                        cursor.execute("""
+                            SELECT adicionar_mao_de_obra(%s, %s, %s)
+                        """, [id_usuario, nome, valor])
+                messages.success(request, "Mãos de obra importadas com sucesso.")
+            except Exception as e:
+                messages.error(request, f"Erro ao importar JSON: {e}")
+        else:
+            messages.error(request, "Nenhum ficheiro foi carregado.")
+        return redirect('app_bd2:listar_mao_de_obra')
+    
+class DecimalEncoder(DjangoJSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
+
+def exportar_mao_de_obra_json(request):
+    mao_de_obra_list = get_all_mao_de_obra()
+
+    mao_de_obra_json = json.dumps(mao_de_obra_list, indent=4, cls=DecimalEncoder)
+
+    response = HttpResponse(mao_de_obra_json, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="mao_de_obra.json"'
+    
+    return response
 
 #--------------------- VEICULOS  --------------------------#
 
