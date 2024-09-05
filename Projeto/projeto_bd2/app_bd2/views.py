@@ -665,7 +665,7 @@ def importar_mao_de_obra_json(request):
                 
                 if isinstance(data, list):
                     for item in data:
-                        id_usuario = item.get('id_usuario')
+                        id_usuario = item.get('id_usuarios')
                         nome = item.get('nome')
                         valor = item.get('valor')
 
