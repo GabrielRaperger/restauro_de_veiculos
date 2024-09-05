@@ -1,7 +1,7 @@
 -- Objetos Lógicos
 
 ------------------------------ SEQUENCE USUARIOS -----------------------------------------
-CREATE SEQUENCE usuarios_id_seq
+CREATE SEQUENCE IF NOT EXISTS usuarios_id_seq
     START WITH 22
     INCREMENT BY 1
     MINVALUE 1
