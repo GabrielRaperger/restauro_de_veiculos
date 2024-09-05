@@ -655,30 +655,37 @@ def get_all_mao_de_obra():
         """)
         rows = cursor.fetchall()
         return [{'id': row[0], 'nome': row[1], 'valor': row[2]} for row in rows]
-  
+
 def importar_mao_de_obra_json(request):
     if request.method == 'POST':
         json_file = request.FILES.get('json_file')
         if json_file:
             try:
                 data = json.load(json_file)
-                for item in data:
-                    id_usuario = item.get('id_usuario')
-                    nome = item.get('nome')
-                    valor = item.get('valor')
+                
+                if isinstance(data, list):
+                    for item in data:
+                        id_usuario = item.get('id_usuario')
+                        nome = item.get('nome')
+                        valor = item.get('valor')
 
-                    # Usar a função PL/pgSQL para inserir os dados
-                    with connection.cursor() as cursor:
-                        cursor.execute("""
-                            SELECT adicionar_mao_de_obra(%s, %s, %s)
-                        """, [id_usuario, nome, valor])
-                messages.success(request, "Mãos de obra importadas com sucesso.")
+                        with connection.cursor() as cursor:
+                            cursor.execute("""
+                                SELECT adicionar_mao_de_obra(%s, %s, %s)
+                            """, [id_usuario, nome, valor])
+                    messages.success(request, "Mãos de obra importadas com sucesso.")
+                else:
+                    messages.error(request, "Formato de JSON inválido. Esperava-se uma lista de objetos.")
+
+            except json.JSONDecodeError:
+                messages.error(request, "Ficheiro JSON inválido. Por favor, verifique o formato do ficheiro.")
             except Exception as e:
                 messages.error(request, f"Erro ao importar JSON: {e}")
         else:
             messages.error(request, "Nenhum ficheiro foi carregado.")
-        return redirect('app_bd2:listar_mao_de_obra')
-    
+            
+        return redirect('app_bd2:lista_MaoDeObra')   
+
 class DecimalEncoder(DjangoJSONEncoder):
     def default(self, obj):
         if isinstance(obj, Decimal):
