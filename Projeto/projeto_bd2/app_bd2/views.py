@@ -692,8 +692,17 @@ class DecimalEncoder(DjangoJSONEncoder):
             return float(obj)
         return super().default(obj)
 
+def get_all_mao_de_obra_exportar():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_usuarios, nome, valor
+            FROM mao_de_obra
+        """)
+        rows = cursor.fetchall()
+        return [{'id_usuarios': row[0], 'nome': row[1], 'valor': row[2]} for row in rows]
+
 def exportar_mao_de_obra_json(request):
-    mao_de_obra_list = get_all_mao_de_obra()
+    mao_de_obra_list = get_all_mao_de_obra_exportar()
 
     mao_de_obra_json = json.dumps(mao_de_obra_list, indent=4, cls=DecimalEncoder)
 
