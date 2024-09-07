@@ -1,0 +1,53 @@
+Primeiramente tens de ter o POSTGRES
+
+Com isso vais a projeto_bd2/projeto_bd2/setting.py 
+
+e altere os dados USER e PASSWORD para o login do seu POSTGRES
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'BD2', - Deixe o Mesmo
+        'USER': 'postgres', - Coloque o utilizador criado no seu postgres
+        'PASSWORD': 'estgv', - coloque a senha definida por você quando se instalou o pgadmin
+        'HOST': 'localhost',  - Deixe o Mesmo
+        'PORT': '5432', - Deixe o Mesmo 
+    }
+}
+
+
+Com esses dados alterados, Abra seu pgadmin e crie uma Database chamada BD2
+Com a database criada abre uma query e 
+
+execute Modelos/Script_Criar_Tabelas.sql
+
+Em Seguida
+
+Execute Modelos/Script_Inserir_Tabelas.sql
+
+E por ultimo
+
+Execute Modelos/Script_Objetos_Lógicos.sql
+
+Com isso vá para o mongodb Compass e abra no conection padrão
+
+Crie uma database no mongo chamada "BD2" e com a colletion chamada "veiculos"
+
+Com isso vá em add data e Import JSON e importe o arquivo Modelos/mongodb.JSON
+
+faça CD restauro_de_veiculos\Projeto\projeto_bd2
+
+E Execute no CMD
+pip install psycopg2
+pip install pymongo
+
+Em seguida faça
+
+python manage.py setup_users
+
+E para fazer o servidor funcionar faça
+
+python manage.py runserver
+
+Todos os dados para login estão no README.md 
+abra esse arquivo e use as credenciais para utilizar o website.
