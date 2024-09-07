@@ -711,6 +711,47 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE excluir_veiculo(
+	p_id_veiculo INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	-- Excluir as faturas relacionadas às saídas do veículo
+    DELETE FROM faturas
+    WHERE id_saida IN (
+        SELECT id_saida
+        FROM saida
+        WHERE id_restauro IN (
+            SELECT id_restauro 
+            FROM restauro 
+            WHERE id_entrada IN (SELECT id_entrada FROM entrada WHERE id_veiculo = p_id_veiculo)
+        )
+    );
 
+    -- Excluir as saídas relacionadas aos restauros do veículo
+    DELETE FROM saida
+    WHERE id_restauro IN (
+        SELECT id_restauro 
+        FROM restauro 
+        WHERE id_entrada IN (SELECT id_entrada FROM entrada WHERE id_veiculo = p_id_veiculo)
+    );
 
+    -- Excluir as relações de mão de obra dos restauros relacionados
+    DELETE FROM mao_restauro
+    WHERE id_restauro IN (
+        SELECT id_restauro 
+        FROM restauro 
+        WHERE id_entrada IN (SELECT id_entrada FROM entrada WHERE id_veiculo = p_id_veiculo)
+    );
 
+    -- Excluir os restauros relacionados às entradas do veículo
+    DELETE FROM restauro
+    WHERE id_entrada IN (SELECT id_entrada FROM entrada WHERE id_veiculo = p_id_veiculo);
+
+    -- Excluir as entradas relacionadas ao veículo na tabela 'entrada'
+    DELETE FROM entrada WHERE id_veiculo = p_id_veiculo;
+
+    -- Excluir o veículo da tabela 'veiculo'
+    DELETE FROM veiculo WHERE id_veiculo = p_id_veiculo;
+END; $$;

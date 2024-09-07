@@ -927,7 +927,7 @@ def eliminar_veiculo(request, id_veiculo):
             # Excluir o veículo do PostgreSQL
             with connection.cursor() as cursor:
                 # Execute a função SQL para excluir o veículo
-                cursor.execute("SELECT excluir_veiculo(%s);", [id_veiculo])
+                cursor.execute("CALL excluir_veiculo(%s);", [id_veiculo])
                 
                 # Ajustar a sequência após a exclusão
                 cursor.execute("""
